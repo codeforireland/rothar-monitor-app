@@ -9,6 +9,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +42,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 	}
 	
 	private void fetchStolenBikeData(Context context) {
-		new DownloadStoleBikesTask(context).execute(Constants.SERVER_URL + "/v3/assets?limit=20&offset=0&status=STOLEN");		
+		new DownloadStoleBikesTask(context).execute(Constants.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN");		
 	}	
 	
 	private class DownloadStoleBikesTask extends AsyncTask<String, Void, String> {
@@ -48,8 +52,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 		
 		public DownloadStoleBikesTask(Context context) {
 			this.context = context;
-		}
-		
+		}		
 		
 		@Override
 		protected String doInBackground(String... urls) {
@@ -65,9 +68,9 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 		// a string.
 		private String downloadUrl(String myurl) throws IOException {
 		    InputStream is = null;
-		    // Only display the first 500 characters of the retrieved
+		    // Only display the first 15000 characters of the retrieved
 		    // web page content.
-		    int len = 5000;
+		    int len = 15000;
 		        
 		    try {
 		        URL url = new URL(myurl);
@@ -106,6 +109,17 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 		
 		@Override
 		protected void onPostExecute(String result) {
+			// JSONArray array = new JSONArray().
+			try {
+				JSONArray jsonArray = new JSONArray(result);
+				for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        explrObject.getString("assetId");
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 			showToast(context, "Stolen bikes list returned: " + result);
 		}
 				
