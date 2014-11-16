@@ -8,14 +8,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import eu.appbucket.monitor.location.LocationReader;
+import eu.appbucket.monitor.monitor.StolenBikeMonitor;
+import eu.appbucket.monitor.update.StolenBikeUpdater;
 
 public class MainActivity extends Activity {
 	
 	private static final long MINUTESx10 = 1000 * 60 * 10;
-	private static final long SECONDSx10 = 1000 * 10;
-	private static final long SECONDSx1 = 1000;
-	private static final long SECONDSx2 = 2 * SECONDSx1;
-	private static final long ALARM_INTERVAL = SECONDSx10;
+	private static final long SECONDx1 = 1000;
+	private static final long SECONDSx10 = SECONDx1 * 10;
+	private static final long SECONDSx20 = SECONDx1 * 20;
+	private static final long SECONDSx2 = 2 * SECONDx1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +27,24 @@ public class MainActivity extends Activity {
 		scheduleStoleBikeUpdaterAlarm();
 	}
 
-	private void scheduleStoleBikeUpdaterAlarm() {		
-		Intent intent = new Intent(this, StolenBikeUpdater.class);
-		PendingIntent alarmIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	private void scheduleStoleBikeUpdaterAlarm() {
+		startUpdater();
+		startMonitor();
+	}
+	
+	private void startUpdater() {
+		Intent updaterIntent = new Intent(this, StolenBikeUpdater.class);
+		PendingIntent updater = PendingIntent.getBroadcast(MainActivity.this, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, ALARM_INTERVAL, alarmIntent);
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx20, updater);
+		
+	}
+	
+	private void startMonitor() {
+		Intent monitorIntent = new Intent(this, StolenBikeMonitor.class);
+		PendingIntent monitor = PendingIntent.getBroadcast(MainActivity.this, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx10, monitor);
 	}
 	
 	@Override
