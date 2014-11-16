@@ -103,10 +103,19 @@ public class StolenBikeReporter {
 		        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		        conn.setReadTimeout(20000 /* milliseconds */);
 		        conn.setConnectTimeout(30000 /* milliseconds */);
-		        conn.setRequestMethod("GET");
+		        conn.setRequestMethod("POST");
 		        conn.setDoInput(true);
+		        conn.setDoOutput(true);
+		        conn.setRequestProperty("Content-Type", 
+		                "application/x-www-form-urlencoded");
+		        conn.setUseCaches(false);
 		        // Starts the query
 		        conn.connect();
+		        
+		        
+		        // TODO: add JSON to the post //
+		        
+		        
 		        int response = conn.getResponseCode();
 		        Log.d(DEBUG_TAG, "The response is: " + response);
 		        is = conn.getInputStream();
