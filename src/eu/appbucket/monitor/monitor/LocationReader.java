@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.location;
+package eu.appbucket.monitor.monitor;
 
 import android.content.Context;
 import android.location.Location;

@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import eu.appbucket.monitor.location.LocationReader;
+import eu.appbucket.monitor.monitor.LocationReader;
 import eu.appbucket.monitor.monitor.StolenBikeMonitor;
 import eu.appbucket.monitor.update.StolenBikeUpdater;
 
@@ -16,8 +16,8 @@ public class MainActivity extends Activity {
 	
 	private static final long MINUTESx10 = 1000 * 60 * 10;
 	private static final long SECONDx1 = 1000;
-	private static final long SECONDSx10 = SECONDx1 * 10;
 	private static final long SECONDSx20 = SECONDx1 * 20;
+	private static final long SECONDSx60 = 60 * SECONDx1 ;
 	private static final long SECONDSx2 = 2 * SECONDx1;
 	
 	@Override
@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
 		Intent updaterIntent = new Intent(this, StolenBikeUpdater.class);
 		PendingIntent updater = PendingIntent.getBroadcast(MainActivity.this, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx20, updater);
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx60, updater);
 		
 	}
 	
@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 		Intent monitorIntent = new Intent(this, StolenBikeMonitor.class);
 		PendingIntent monitor = PendingIntent.getBroadcast(MainActivity.this, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx10, monitor);
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx20, monitor);
 	}
 	
 	@Override

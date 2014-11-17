@@ -10,19 +10,25 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.bluetooth.BluetoothClass.Device.Major;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.monitor.Constants;
+import eu.appbucket.monitor.monitor.BikeRecord;
 import eu.appbucket.monitor.update.StolenBikeDbHelper;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
@@ -30,12 +36,15 @@ public class StolenBikeReporter {
 	
 	private static final String DEBUG_TAG = "StolenBikeReporter";
 	
-	public void report(Context context, int minor, Location location) {
-		int assetId = lookupAssetIdByMajor(context, minor);
-		postReport(context, assetId, location.getLatitude(), location.getLongitude());
+	public void report(Context context, BikeRecord beacon, Location location) {
+		int assetId = lookupAssetIdByMajor(context, beacon.getMinor());
+		if(assetId != -1) {
+			postReport(context, assetId, location.getLatitude(), location.getLongitude());	
+		}
 	}
 	
 	private int lookupAssetIdByMajor(Context context, int minor) {
+		int assetId = -1;
 		StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		String[] projection = {
@@ -55,10 +64,14 @@ public class StolenBikeReporter {
 			    ""                                 // The sort order
 		);
 		cursor.moveToFirst();
-		int assetId = cursor.getInt(
-		    cursor.getColumnIndexOrThrow(StolenBikeDbHelper.COLUMN_NAME_ASSET_ID)
-		);
-		Log.d(DEBUG_TAG, "Reporting found asset id: " + assetId);
+		if(cursor.getCount() > 0) {
+			assetId = cursor.getInt(
+				    cursor.getColumnIndexOrThrow(
+				    		StolenBikeDbHelper.COLUMN_NAME_ASSET_ID));	
+			Log.d(DEBUG_TAG, "Reporting found asset id: " + assetId);
+		} else {
+			Log.e(DEBUG_TAG, "Can't find asset id for minor: " + minor);
+		}
 		return assetId;
 	}
 	
@@ -80,114 +93,41 @@ public class StolenBikeReporter {
 		}		
 		
 		@Override
-		protected Void doInBackground(ReportData... report) {
-			/*try {
-				//return postReport(urls[0]);	
-			} catch (IOException e) {
-				// return "Can't file the report: ";
-			}*/	
+		protected Void doInBackground(ReportData... reports) {
+			try {
+				postReport(reports[0]);
+			} catch (IOException | JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return null;
 		}
 		
 		// Given a URL, establishes an HttpUrlConnection and retrieves
 		// the web page content as a InputStream, which it returns as
 		// a string.
-		private String postReport(ReportData report) throws IOException {
-		    InputStream is = null;
-		    // Only display the first 15000 characters of the retrieved
-		    // web page content.
-		    int len = 15000;
-		        
-		    try {
-		        URL url = new URL(Constants.SERVER_URL + "/v3/assets/" + report.getAssetId() + "/reports");
-		        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		        conn.setReadTimeout(20000 /* milliseconds */);
-		        conn.setConnectTimeout(30000 /* milliseconds */);
-		        conn.setRequestMethod("POST");
-		        conn.setDoInput(true);
-		        conn.setDoOutput(true);
-		        conn.setRequestProperty("Content-Type", 
-		                "application/x-www-form-urlencoded");
-		        conn.setUseCaches(false);
-		        // Starts the query
-		        conn.connect();
-		        
-		        
-		        // TODO: add JSON to the post //
-		        
-		        
-		        int response = conn.getResponseCode();
-		        Log.d(DEBUG_TAG, "The response is: " + response);
-		        is = conn.getInputStream();
-
-		        // Convert the InputStream into a string
-		        String contentAsString = readIt(is, len);
-		        return contentAsString;
-		        
-		    // Makes sure that the InputStream is closed after the app is
-		    // finished using it.
-		    } finally {
-		        if (is != null) {
-		            is.close();
-		        } 
-		    }
-		}
-		
-		// Reads an InputStream and converts it to a String.
-		public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-		    Reader reader = null;
-		    reader = new InputStreamReader(stream, "UTF-8");        
-		    char[] buffer = new char[len];
-		    reader.read(buffer);
-		    return new String(buffer);
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			Map<Integer, Integer> stolenBikesAssetIdToMajor = new HashMap<Integer, Integer>(); 
-			try {
-				JSONArray jsonArray = new JSONArray(result);
-				for (int i = 0; i < jsonArray.length(); i++) {
-			        JSONObject explrObject = jsonArray.getJSONObject(i);
-			        stolenBikesAssetIdToMajor.put(explrObject.getInt("assetId"), explrObject.getInt("minor"));			        
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			} 
-			cleanStolenBikeData();
-	        storeStolenBikeData(stolenBikesAssetIdToMajor);
-		}
-		
-		private void showToast(Context context, String message) {
-			int duration = Toast.LENGTH_SHORT;
-			Toast toast = Toast.makeText(context, message, duration);
-			toast.show();
-		}
-		
-		private void storeStolenBikeData(Map<Integer, Integer> stolenBikes) {
-			StringBuilder toastData = new StringBuilder("Stolen bike ids: ");
-			StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
-			SQLiteDatabase db = dbHelper.getWritableDatabase();
-			long newRowId;
-			int major;
-			for (int assetId : stolenBikes.keySet()) {
-				major = stolenBikes.get(assetId); 
-				ContentValues values = new ContentValues();
-				values.put(StolenBikeDbHelper.COLUMN_NAME_ASSET_ID, assetId);				
-				values.put(StolenBikeDbHelper.COLUMN_NAME_MAJOR, major);
-				newRowId = db.insert(
-						StolenBikeDbHelper.TABLE_NAME,
-						null,
-				        values);
-				toastData.append(assetId + "," + major + "["+newRowId+"], ");
-			}
-			showToast(context, toastData.toString());		
-		}
-		
-		private void cleanStolenBikeData() {
-			StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
-			SQLiteDatabase db = dbHelper.getWritableDatabase();
-			db.delete(StolenBikeDbHelper.TABLE_NAME, null, null);
+		private void postReport(ReportData report) throws IOException, JSONException {
+		        JSONObject jsonObj = new JSONObject();
+				jsonObj.put("assetId", report.getAssetId());
+				jsonObj.put("latitude", report.getLatitude());
+				jsonObj.put("longitude", report.getLongitude());			
+		        String payload = jsonObj.toString();
+		        AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+		        HttpPost request = new HttpPost(Constants.SERVER_URL + "/v3/assets/" + report.getAssetId() + "/reports");
+		        HttpResponse response = null;
+		        request.setHeader( "Content-Type", "application/json" );
+		        try {
+		        	StringEntity se = new StringEntity(payload);
+			        se.setContentEncoding("UTF-8");
+			        se.setContentType("application/json");	        
+			        request.setEntity(se);		        
+			        response = client.execute(request);
+		        } catch (IOException e) {
+		            Log.d(DEBUG_TAG, "Can't send the report: " + e.getMessage());
+		            e.printStackTrace();
+		        } finally {
+		        	client.close();
+		        }
 		}
 	}
 }

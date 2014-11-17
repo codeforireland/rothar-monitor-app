@@ -7,8 +7,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -16,7 +15,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -26,10 +24,12 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.monitor.Constants;
+import eu.appbucket.monitor.monitor.BikeRecord;
 
 public class StolenBikeUpdater extends BroadcastReceiver {
 
 	private Context context;
+	private static final String DEBUG_TAG = "StolenBikeUpdater";
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -117,18 +117,28 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 		
 		@Override
 		protected void onPostExecute(String result) {
-			Map<Integer, Integer> stolenBikesAssetIdToMajor = new HashMap<Integer, Integer>(); 
+			cleanStolenBikeData();
+			Set<BikeRecord> stolenBikes = processResult(result);
+	        storeStolenBikeData(stolenBikes);
+		}
+		
+		private Set<BikeRecord> processResult(String result) {
+			Set<BikeRecord> stolenBikes = new HashSet<BikeRecord>(); 
 			try {
 				JSONArray jsonArray = new JSONArray(result);
 				for (int i = 0; i < jsonArray.length(); i++) {
 			        JSONObject explrObject = jsonArray.getJSONObject(i);
-			        stolenBikesAssetIdToMajor.put(explrObject.getInt("assetId"), explrObject.getInt("minor"));			        
+			        stolenBikes.add(
+			        		new BikeRecord(
+			        				explrObject.getInt("assetId"), 
+			        				explrObject.getString("uuid"), 
+			        				explrObject.getInt("major"), 
+			        				explrObject.getInt("minor")));			        
 				}
 			} catch (JSONException e) {
-				e.printStackTrace();
-			} 
-			cleanStolenBikeData();
-	        storeStolenBikeData(stolenBikesAssetIdToMajor);
+				Log.e(DEBUG_TAG, "Can't process stolen bikes");
+			}
+			return stolenBikes;
 		}
 		
 		private void showToast(Context context, String message) {
@@ -137,30 +147,17 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 			toast.show();
 		}
 		
-		private void storeStolenBikeData(Map<Integer, Integer> stolenBikes) {
+		private void storeStolenBikeData(Set<BikeRecord> stolenBikes) {
 			StringBuilder toastData = new StringBuilder("Stolen bike ids: ");
-			StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
-			SQLiteDatabase db = dbHelper.getWritableDatabase();
-			long newRowId;
-			int major;
-			for (int assetId : stolenBikes.keySet()) {
-				major = stolenBikes.get(assetId); 
-				ContentValues values = new ContentValues();
-				values.put(StolenBikeDbHelper.COLUMN_NAME_ASSET_ID, assetId);				
-				values.put(StolenBikeDbHelper.COLUMN_NAME_MAJOR, major);
-				newRowId = db.insert(
-						StolenBikeDbHelper.TABLE_NAME,
-						null,
-				        values);
-				toastData.append(assetId + "," + major + "["+newRowId+"], ");
+			for (BikeRecord record : stolenBikes) {
+				new StolenBikeDao().addStolenBikeRecord(context, record);
+				toastData.append(record);
 			}
 			showToast(context, toastData.toString());		
 		}
 		
 		private void cleanStolenBikeData() {
-			StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
-			SQLiteDatabase db = dbHelper.getWritableDatabase();
-			db.delete(StolenBikeDbHelper.TABLE_NAME, null, null);
+			new StolenBikeDao().resetStolenBikes(context);
 		}
 	}
 }
