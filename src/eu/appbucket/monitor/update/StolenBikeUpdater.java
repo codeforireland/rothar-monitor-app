@@ -24,7 +24,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.monitor.Constants;
-import eu.appbucket.monitor.monitor.BikeRecord;
+import eu.appbucket.monitor.monitor.BikeBeacon;
 
 public class StolenBikeUpdater extends BroadcastReceiver {
 
@@ -118,18 +118,18 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 		@Override
 		protected void onPostExecute(String result) {
 			cleanStolenBikeData();
-			Set<BikeRecord> stolenBikes = processResult(result);
+			Set<BikeBeacon> stolenBikes = processResult(result);
 	        storeStolenBikeData(stolenBikes);
 		}
 		
-		private Set<BikeRecord> processResult(String result) {
-			Set<BikeRecord> stolenBikes = new HashSet<BikeRecord>(); 
+		private Set<BikeBeacon> processResult(String result) {
+			Set<BikeBeacon> stolenBikes = new HashSet<BikeBeacon>(); 
 			try {
 				JSONArray jsonArray = new JSONArray(result);
 				for (int i = 0; i < jsonArray.length(); i++) {
 			        JSONObject explrObject = jsonArray.getJSONObject(i);
 			        stolenBikes.add(
-			        		new BikeRecord(
+			        		new BikeBeacon(
 			        				explrObject.getInt("assetId"), 
 			        				explrObject.getString("uuid"), 
 			        				explrObject.getInt("major"), 
@@ -147,9 +147,9 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 			toast.show();
 		}
 		
-		private void storeStolenBikeData(Set<BikeRecord> stolenBikes) {
+		private void storeStolenBikeData(Set<BikeBeacon> stolenBikes) {
 			StringBuilder toastData = new StringBuilder("Stolen bike ids: ");
-			for (BikeRecord record : stolenBikes) {
+			for (BikeBeacon record : stolenBikes) {
 				new StolenBikeDao().addStolenBikeRecord(context, record);
 				toastData.append(record);
 			}

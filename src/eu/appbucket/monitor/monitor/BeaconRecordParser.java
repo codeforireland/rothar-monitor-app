@@ -25,7 +25,7 @@ public class BeaconRecordParser {
 		return isValidRecord;
 	}
 	
-	public BikeRecord parserRecordToBeacon() {
+	public BikeBeacon parserRecordToBeacon() {
 		if(isValidRecord == false)
 			return null;
 		// Convert to hex String
@@ -46,7 +46,7 @@ public class BeaconRecordParser {
 		int minor = (record[startByte + 22] & 0xff) * 0x100
 				+ (record[startByte + 23] & 0xff);
 		Log.d(DEBUG_TAG, "Tag, uuid: " + uuid + ", major: " + major + ", minor " + minor);
-		BikeRecord record = new BikeRecord(uuid, major, minor);
+		BikeBeacon record = new BikeBeacon(uuid, major, minor);
 		return record;
 	}
 	

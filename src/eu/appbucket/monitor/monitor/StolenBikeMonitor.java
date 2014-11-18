@@ -33,7 +33,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	private Handler mHandler;
 	private boolean mScanning;
 	private LocationReader locationUpdater;
-	private Set<BikeRecord> beaconsFound = new HashSet<BikeRecord>();
+	private Set<BikeBeacon> beaconsFound = new HashSet<BikeBeacon>();
 	
 	private void run(Context context) {
 		setup(context);
@@ -60,7 +60,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	private void processRecord(byte[] scanRecord) {
 		BeaconRecordParser parser = new BeaconRecordParser(scanRecord);
 		if(parser.isRecordValid()) {
-			BikeRecord beacon = parser.parserRecordToBeacon();
+			BikeBeacon beacon = parser.parserRecordToBeacon();
 			if(isSupportedBySystem(beacon)) {
 				beacon = findInStolenBikes(beacon);
 				if(beacon.getAssetId() != null) {
@@ -70,14 +70,14 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 		}
 	}
 	
-	private  boolean isSupportedBySystem(BikeRecord beacon) {
+	private  boolean isSupportedBySystem(BikeBeacon beacon) {
 		if(beacon.getUudi().equals(Constants.IBEACON_UUID) && beacon.getMajor() == Constants.IBEACON_MAJOR) {
 			return true;
 		}
 		return false;
 	}
 	
-	private BikeRecord findInStolenBikes(BikeRecord beacon) {
+	private BikeBeacon findInStolenBikes(BikeBeacon beacon) {
 		beacon = new StolenBikeDao().findBikeRecordByMinorIdentity(
 				context, beacon.getUudi(), beacon.getMajor(), beacon.getMinor());
 		return beacon;
@@ -116,7 +116,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 		mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		locationUpdater.stop(context);
 		showToast("Found stolen bikes: " + beaconsFound + " at location: " + locationUpdater.getCurrentBestLocation());
-		for(BikeRecord beacon: beaconsFound) {
+		for(BikeBeacon beacon: beaconsFound) {
 			new StolenBikeReporter().report(context, beacon, locationUpdater.getCurrentBestLocation());
 		}
 		Log.d(DEBUG_TAG, "Stopping scanner at: " + new Date());

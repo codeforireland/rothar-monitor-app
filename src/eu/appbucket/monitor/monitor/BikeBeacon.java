@@ -1,23 +1,23 @@
 package eu.appbucket.monitor.monitor;
 
-public class BikeRecord {
+public class BikeBeacon {
 
 	private Integer assetId;
 	private String uudi;
 	private int major;
 	private int minor;
 	
-	public BikeRecord() {
+	public BikeBeacon() {
 	}
 			
-	public BikeRecord(Integer assetId, String uudi, int major, int minor) {
+	public BikeBeacon(Integer assetId, String uudi, int major, int minor) {
 		this.assetId = assetId;
 		this.uudi = uudi;
 		this.major = major;
 		this.minor = minor;
 	}
 	
-	public BikeRecord(String uudi, int major, int minor) {
+	public BikeBeacon(String uudi, int major, int minor) {
 		this.uudi = uudi;
 		this.major = major;
 		this.minor = minor;
@@ -65,7 +65,7 @@ public class BikeRecord {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BikeRecord other = (BikeRecord) obj;
+		BikeBeacon other = (BikeBeacon) obj;
 		if (major != other.major)
 			return false;
 		if (minor != other.minor)

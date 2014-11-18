@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 public class LocationReader {
 
-	// Acquire a reference to the system Location Manager
 	private LocationManager locationManager;
 	private Location currentBestLocation;
 	private static final int TWO_MINUTES = 1000 * 60 * 2;

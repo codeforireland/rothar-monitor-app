@@ -4,11 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import eu.appbucket.monitor.monitor.BikeRecord;
+import eu.appbucket.monitor.monitor.BikeBeacon;
 
 public class StolenBikeDao {
 	
-	public void addStolenBikeRecord(Context context, BikeRecord record) {
+	public void addStolenBikeRecord(Context context, BikeBeacon record) {
 		StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -28,8 +28,8 @@ public class StolenBikeDao {
 		db.delete(StolenBikeDbHelper.TABLE_NAME, null, null);
 	}
 	
-	public BikeRecord findBikeRecordByMinorIdentity(Context context, String uuid, int major, int minor) {
-		BikeRecord record = new BikeRecord();
+	public BikeBeacon findBikeRecordByMinorIdentity(Context context, String uuid, int major, int minor) {
+		BikeBeacon record = new BikeBeacon();
 		StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		String[] projection = {
