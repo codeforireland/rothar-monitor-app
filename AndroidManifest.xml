@@ -30,5 +30,6 @@
         </activity>
     <receiver android:name="eu.appbucket.monitor.update.StolenBikeUpdater" />    
     <receiver android:name="eu.appbucket.monitor.monitor.StolenBikeMonitor" />
+    <receiver android:name="eu.appbucket.monitor.TestUpdater" />
     </application>
 </manifest>

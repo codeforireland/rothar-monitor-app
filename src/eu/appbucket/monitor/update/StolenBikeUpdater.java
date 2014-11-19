@@ -32,11 +32,18 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 	private static final String DEBUG_TAG = "StolenBikeUpdater";
 	
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(Context context, Intent intent) {		
 		this.context = context;
+		showToast("Updateting stolen bikes list...");
 		if(isNetworkAvailable()) {
 			fetchStolenBikeData();
 		}
+	}
+	
+	private void showToast(String message) {
+		int duration = Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(context, message, duration);
+		toast.show();
 	}
 	
 	private boolean isNetworkAvailable() {
@@ -147,13 +154,11 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 			toast.show();
 		}
 		
-		private void storeStolenBikeData(Set<BikeBeacon> stolenBikes) {
-			StringBuilder toastData = new StringBuilder("Stolen bike ids: ");
+		private void storeStolenBikeData(Set<BikeBeacon> stolenBikes) {			
 			for (BikeBeacon record : stolenBikes) {
 				new StolenBikeDao().addStolenBikeRecord(context, record);
-				toastData.append(record);
 			}
-			showToast(context, toastData.toString());		
+			showToast(context, "Stolen bike list contains: " + stolenBikes.size() + " records.");		
 		}
 		
 		private void cleanStolenBikeData() {

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import eu.appbucket.monitor.monitor.LocationReader;
 import eu.appbucket.monitor.monitor.StolenBikeMonitor;
 import eu.appbucket.monitor.update.StolenBikeUpdater;
 
@@ -29,15 +28,22 @@ public class MainActivity extends Activity {
 
 	private void scheduleStoleBikeUpdaterAlarm() {
 		startUpdater();
-		startMonitor();
+		/*startMonitor();*/
+		/*startTest();*/
+	}
+
+	private void startTest() {
+		Intent testerIntent = new Intent(this, TestUpdater.class);
+		PendingIntent tester = PendingIntent.getBroadcast(MainActivity.this, 0, testerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx2, tester);
 	}
 	
 	private void startUpdater() {
 		Intent updaterIntent = new Intent(this, StolenBikeUpdater.class);
 		PendingIntent updater = PendingIntent.getBroadcast(MainActivity.this, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx60, updater);
-		
+		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx60, updater);		
 	}
 	
 	private void startMonitor() {
