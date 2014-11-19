@@ -1,5 +1,7 @@
 package eu.appbucket.monitor;
 
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,44 +15,32 @@ import eu.appbucket.monitor.update.StolenBikeUpdater;
 
 public class MainActivity extends Activity {
 	
-	private static final long MINUTESx10 = 1000 * 60 * 10;
-	private static final long SECONDx1 = 1000;
-	private static final long SECONDSx20 = SECONDx1 * 20;
-	private static final long SECONDSx60 = 60 * SECONDx1 ;
-	private static final long SECONDSx2 = 2 * SECONDx1;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		scheduleStoleBikeUpdaterAlarm();
-	}
-
-	private void scheduleStoleBikeUpdaterAlarm() {
-		startUpdater();
-		/*startMonitor();*/
-		/*startTest();*/
-	}
-
-	private void startTest() {
-		Intent testerIntent = new Intent(this, TestUpdater.class);
-		PendingIntent tester = PendingIntent.getBroadcast(MainActivity.this, 0, testerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx2, tester);
+		startInLoop();
 	}
 	
-	private void startUpdater() {
+	private void startInLoop() {
+		startUpdaterInLoop();
+		startMonitorInLoop();
+	}
+	
+	private void startUpdaterInLoop() {
 		Intent updaterIntent = new Intent(this, StolenBikeUpdater.class);
 		PendingIntent updater = PendingIntent.getBroadcast(MainActivity.this, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx60, updater);		
+		alarmMgr.setInexactRepeating(
+				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.UPDATER.UPDATE_FREQUENCY, updater);		
 	}
 	
-	private void startMonitor() {
+	private void startMonitorInLoop() {
 		Intent monitorIntent = new Intent(this, StolenBikeMonitor.class);
 		PendingIntent monitor = PendingIntent.getBroadcast(MainActivity.this, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, SECONDSx20, monitor);
+		alarmMgr.setInexactRepeating(
+				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.MONITOR.SEARCH_FREQUENCY, monitor);
 	}
 	
 	@Override

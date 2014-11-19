@@ -1,9 +1,7 @@
 package eu.appbucket.monitor.monitor;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,9 +10,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
-import eu.appbucket.monitor.Constants;
+import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.report.StolenBikeReporter;
 import eu.appbucket.monitor.update.StolenBikeDao;
 
@@ -71,20 +68,21 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	}
 	
 	private  boolean isSupportedBySystem(BikeBeacon beacon) {
-		if(beacon.getUudi().equals(Constants.IBEACON_UUID) && beacon.getMajor() == Constants.IBEACON_MAJOR) {
+		if(beacon.getUudi().equals(Settings.IBEACON.IBEACON_UUID) 
+				&& beacon.getMajor() == Settings.IBEACON.IBEACON_MAJOR) {
 			return true;
 		}
 		return false;
 	}
 	
 	private BikeBeacon findInStolenBikes(BikeBeacon beacon) {
-		beacon = new StolenBikeDao().findBikeRecordByMinorIdentity(
+		beacon = new StolenBikeDao().findBikeRecordByIdentity(
 				context, beacon.getUudi(), beacon.getMajor(), beacon.getMinor());
 		return beacon;
 	}
 	
 	private void start() {
-		showToast("Scanning for stolen bikes and current location...");
+		showToast("Searching stolen bikes ...");
 		scanLeDevice(true);
 	}
 		
@@ -102,7 +100,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 				public void run() {
 					stop();
 				}
-			}, Constants.SCAN_PERIOD);
+			}, Settings.MONITOR.SEARCH_DURATION);
 			mScanning = true;
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
@@ -115,10 +113,9 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 		mScanning = false;
 		mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		locationUpdater.stop(context);
-		showToast("Found stolen bikes: " + beaconsFound + " at location: " + locationUpdater.getCurrentBestLocation());
 		for(BikeBeacon beacon: beaconsFound) {
-			new StolenBikeReporter().report(context, beacon, locationUpdater.getCurrentBestLocation());
+			new StolenBikeReporter(context).report(beacon, locationUpdater.getCurrentBestLocation());
 		}
-		Log.d(DEBUG_TAG, "Stopping scanner at: " + new Date());
+		showToast("Found: " + beaconsFound.size() + " stolen bikes.");
 	}
 }

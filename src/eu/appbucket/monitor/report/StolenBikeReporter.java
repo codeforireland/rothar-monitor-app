@@ -15,17 +15,25 @@ import android.location.Location;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.appbucket.monitor.Constants;
+import android.widget.Toast;
+import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.monitor.BikeBeacon;
 import eu.appbucket.monitor.update.StolenBikeDbHelper;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class StolenBikeReporter {
 
+	private Context context;
+	
+	public StolenBikeReporter(Context context) {
+		this.context = context;
+	}
+	
 	private static final String DEBUG_TAG = "StolenBikeReporter";
 
-	public void report(Context context, BikeBeacon foundBacon,
+	public void report(BikeBeacon foundBacon,
 			Location reportLocation) {
+		showToast("Reporting bike id: " + foundBacon.getAssetId());
 		ReportData report = new ReportData();
 		report.setAssetId(foundBacon.getAssetId());
 		report.setLatitude(reportLocation.getLatitude());
@@ -33,16 +41,29 @@ public class StolenBikeReporter {
 		new ReportStoleBikesTask().execute(report);
 	}
 
+	private void showToast(String message) {
+		int duration = Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(context, message, duration);
+		toast.show();
+	}
+	
 	private class ReportStoleBikesTask extends
 			AsyncTask<ReportData, Void, Void> {
+		ReportData report;
 		@Override
 		protected Void doInBackground(ReportData... reports) {
 			try {
-				postReport(reports[0]);
+				report = reports[0];
+				postReport(report);
 			} catch (IOException | JSONException e) {
 				Log.e(DEBUG_TAG, "Can't post the report: " + e.getMessage());
 			}
 			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			showToast("Report sent for bike id: " + report.getAssetId());
 		}
 	}
 
@@ -54,7 +75,7 @@ public class StolenBikeReporter {
 		jsonObj.put("longitude", report.getLongitude());
 		String payload = jsonObj.toString();
 		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-		HttpPost request = new HttpPost(Constants.SERVER_URL + "/v3/assets/"
+		HttpPost request = new HttpPost(Settings.SERVER_URL + "/v3/assets/"
 				+ report.getAssetId() + "/reports");
 		HttpResponse response = null;
 		request.setHeader("Content-Type", "application/json");
@@ -64,11 +85,10 @@ public class StolenBikeReporter {
 			se.setContentType("application/json");
 			request.setEntity(se);
 			response = client.execute(request);
-			Log.e(DEBUG_TAG, "Report sent with response: "
+			Log.d(DEBUG_TAG, "Report sent with response: "
 					+ response.getStatusLine().getStatusCode());
 		} catch (IOException e) {
-			Log.d(DEBUG_TAG, "Can't send the report: " + e.getMessage());
-			e.printStackTrace();
+			Log.e(DEBUG_TAG, "Can't send the report: " + e.getMessage());
 		} finally {
 			client.close();
 		}

@@ -23,7 +23,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-import eu.appbucket.monitor.Constants;
+import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.monitor.BikeBeacon;
 
 public class StolenBikeUpdater extends BroadcastReceiver {
@@ -34,7 +34,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {		
 		this.context = context;
-		showToast("Updateting stolen bikes list...");
+		showToast("Updating reported bikes ...");
 		if(isNetworkAvailable()) {
 			fetchStolenBikeData();
 		}
@@ -57,7 +57,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 	}
 	
 	private void fetchStolenBikeData() {
-		new DownloadStoleBikesTask(context).execute(Constants.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN");		
+		new DownloadStoleBikesTask(context).execute(Settings.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN");		
 	}	
 	
 	private class DownloadStoleBikesTask extends AsyncTask<String, Void, String> {
@@ -158,7 +158,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 			for (BikeBeacon record : stolenBikes) {
 				new StolenBikeDao().addStolenBikeRecord(context, record);
 			}
-			showToast(context, "Stolen bike list contains: " + stolenBikes.size() + " records.");		
+			showToast(context, "Reported " + stolenBikes.size() + " stolen bikes");		
 		}
 		
 		private void cleanStolenBikeData() {

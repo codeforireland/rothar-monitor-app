@@ -28,7 +28,7 @@ public class StolenBikeDao {
 		db.delete(StolenBikeDbHelper.TABLE_NAME, null, null);
 	}
 	
-	public BikeBeacon findBikeRecordByMinorIdentity(Context context, String uuid, int major, int minor) {
+	public BikeBeacon findBikeRecordByIdentity(Context context, String uuid, int major, int minor) {
 		BikeBeacon record = new BikeBeacon();
 		StolenBikeDbHelper dbHelper = new StolenBikeDbHelper(context);
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
