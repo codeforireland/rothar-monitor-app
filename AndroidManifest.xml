@@ -14,6 +14,7 @@
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 	<uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />	 
 	
     <application
         android:allowBackup="true"
@@ -30,6 +31,12 @@
         </activity>
     <receiver android:name="eu.appbucket.monitor.update.StolenBikeUpdater" />    
     <receiver android:name="eu.appbucket.monitor.monitor.StolenBikeMonitor" />
-    <receiver android:name="eu.appbucket.monitor.TestUpdater" />
+    <receiver android:name="eu.appbucket.monitor.TaskManager"
+        android:enabled="true">
+	    <intent-filter>
+	        <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+	    </intent-filter>
+	</receiver>
+
     </application>
 </manifest>

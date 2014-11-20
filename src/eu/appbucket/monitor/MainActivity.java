@@ -1,13 +1,14 @@
 package eu.appbucket.monitor;
 
-import java.util.Calendar;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import eu.appbucket.monitor.monitor.StolenBikeMonitor;
@@ -15,32 +16,38 @@ import eu.appbucket.monitor.update.StolenBikeUpdater;
 
 public class MainActivity extends Activity {
 	
+	private int REQUEST_ENABLE_BT = 1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		startInLoop();
+		checkIfBluetoothIsEnabled();		
 	}
 	
-	private void startInLoop() {
-		startUpdaterInLoop();
-		startMonitorInLoop();
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    // Check which request we're responding to
+	    if (requestCode == REQUEST_ENABLE_BT) {
+	        // Make sure the request was successful
+	        if (resultCode == RESULT_OK) {
+	        	new TaskManager(MainActivity.this).startInLoop();
+	        } else {
+	        	this.finish();
+	        }
+	    }		
 	}
 	
-	private void startUpdaterInLoop() {
-		Intent updaterIntent = new Intent(this, StolenBikeUpdater.class);
-		PendingIntent updater = PendingIntent.getBroadcast(MainActivity.this, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.UPDATER.UPDATE_FREQUENCY, updater);		
-	}
-	
-	private void startMonitorInLoop() {
-		Intent monitorIntent = new Intent(this, StolenBikeMonitor.class);
-		PendingIntent monitor = PendingIntent.getBroadcast(MainActivity.this, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alarmMgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.MONITOR.SEARCH_FREQUENCY, monitor);
+	private void checkIfBluetoothIsEnabled() {
+		BluetoothManager bluetoothManager = (BluetoothManager) 
+				MainActivity.this.getSystemService(Context.BLUETOOTH_SERVICE);
+		BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
+		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		} else {
+			new TaskManager(MainActivity.this).startInLoop();
+		}
 	}
 	
 	@Override
