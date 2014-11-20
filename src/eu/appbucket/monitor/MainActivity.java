@@ -1,18 +1,13 @@
 package eu.appbucket.monitor;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import eu.appbucket.monitor.monitor.StolenBikeMonitor;
-import eu.appbucket.monitor.update.StolenBikeUpdater;
 
 public class MainActivity extends Activity {
 	

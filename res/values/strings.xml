@@ -2,6 +2,12 @@
 <resources>
 
     <string name="app_name">rothar-monitor-app</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="system_url">To register you bike please go to dev.rothar.appbucket.eu</string>
+    
+    <string name="system_description">This application is responsible for finding and reporting stolen bicycles.
+    \nPlease do not uninstall so you help us find more stolen bicycles.
+    \nIt runs in the background and use minimal resources.
+    </string>
+    
     <string name="action_settings">Settings</string>
 </resources>

@@ -33,7 +33,6 @@ public class StolenBikeReporter {
 
 	public void report(BikeBeacon foundBacon,
 			Location reportLocation) {
-		showToast("Reporting bike id: " + foundBacon.getAssetId());
 		ReportData report = new ReportData();
 		report.setAssetId(foundBacon.getAssetId());
 		report.setLatitude(reportLocation.getLatitude());

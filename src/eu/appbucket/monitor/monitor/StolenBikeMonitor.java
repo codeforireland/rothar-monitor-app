@@ -116,6 +116,8 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 		for(BikeBeacon beacon: beaconsFound) {
 			new StolenBikeReporter(context).report(beacon, locationUpdater.getCurrentBestLocation());
 		}
-		showToast("Found: " + beaconsFound.size() + " stolen bikes.");
+		if(beaconsFound.size() == 0) {
+			showToast("No stolen bikes found.");	
+		}
 	}
 }
