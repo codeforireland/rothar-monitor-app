@@ -12,17 +12,23 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="15sp"
         android:text="@string/system_url" />
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/textView2"
         android:layout_marginTop="38dp"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="15sp"
         android:text="@string/system_description" />
 
 </RelativeLayout>
