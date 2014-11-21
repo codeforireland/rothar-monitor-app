@@ -158,7 +158,7 @@ public class StolenBikeUpdater extends BroadcastReceiver {
 			for (BikeBeacon record : stolenBikes) {
 				new StolenBikeDao().addStolenBikeRecord(context, record);
 			}
-			showToast(context, "Reported " + stolenBikes.size() + " stolen bikes");		
+			showToast(context, "Registered " + stolenBikes.size() + " stolen bikes");		
 		}
 		
 		private void cleanStolenBikeData() {
