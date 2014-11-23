@@ -11,11 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
+import eu.appbucket.monitor.NotificationManager;
 import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.report.StolenBikeReporter;
+import eu.appbucket.monitor.report.ReporterTask;
 import eu.appbucket.monitor.update.StolenBikeDao;
 
-public class StolenBikeMonitor extends BroadcastReceiver {
+public class MonitorTask extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(final Context context, Intent intent) {
@@ -23,13 +24,12 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	}
 	
 	private Context context;
-	private static final String DEBUG_TAG = "StolenBikeMonitor";
+	private static final String DEBUG_TAG = "MonitorTask";
 	private BluetoothManager bluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothAdapter.LeScanCallback mLeScanCallback;
 	private Handler mHandler;
 	private boolean mScanning;
-	private LocationReader locationUpdater;
 	private Set<BikeBeacon> beaconsFound = new HashSet<BikeBeacon>();
 	
 	private void run(Context context) {
@@ -39,8 +39,6 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 
 	private void setup(Context context) {
 		this.context = context;
-		locationUpdater = new LocationReader(context);
-		locationUpdater.start(context);
 		bluetoothManager = (BluetoothManager) 
 				context.getSystemService(Context.BLUETOOTH_SERVICE);
 		mHandler = new Handler();
@@ -87,9 +85,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	}
 		
 	private void showToast(String message) {
-		int duration = Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(context, message, duration);
-		toast.show();
+		new NotificationManager(context).showNotification(message);
 	}
 
 	private void scanLeDevice(final boolean enable) {
@@ -100,7 +96,7 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 				public void run() {
 					stop();
 				}
-			}, Settings.MONITOR.SEARCH_DURATION);
+			}, Settings.MONITOR_TASK.DURATION);
 			mScanning = true;
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
 		} else {
@@ -112,12 +108,14 @@ public class StolenBikeMonitor extends BroadcastReceiver {
 	private void stop() {
 		mScanning = false;
 		mBluetoothAdapter.stopLeScan(mLeScanCallback);
-		locationUpdater.stop(context);
-		for(BikeBeacon beacon: beaconsFound) {
-			new StolenBikeReporter(context).report(beacon, locationUpdater.getCurrentBestLocation());
-		}
 		if(beaconsFound.size() == 0) {
 			showToast("No stolen bikes found.");	
+		} else {
+			ReporterTask reporter = new ReporterTask(context);
+			for(BikeBeacon beacon: beaconsFound) {
+				reporter.store(beacon);
+			}
+			reporter.report();
 		}
 	}
 }

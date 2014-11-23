@@ -1,49 +1,58 @@
 package eu.appbucket.monitor;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import eu.appbucket.monitor.monitor.StolenBikeMonitor;
-import eu.appbucket.monitor.update.StolenBikeUpdater;
+import eu.appbucket.monitor.monitor.MonitorTaskStarter;
+import eu.appbucket.monitor.monitor.MonitorTaskStopper;
+import eu.appbucket.monitor.update.UpdaterTaskStarter;
+import eu.appbucket.monitor.update.UpdaterTaskStopper;
 
 public class TaskManager extends BroadcastReceiver {
-	
-	private Context context;
+
+	private MonitorTaskStarter monitorStarter;
+	private MonitorTaskStopper monitorStopper;
+	private UpdaterTaskStarter updaterStarter;
+	private UpdaterTaskStopper updaterStopper;
 	
 	public TaskManager() {
 	}
 	
 	public TaskManager(Context context) {
-		this.context = context;
+		monitorStarter = new MonitorTaskStarter(context);
+		monitorStopper = new MonitorTaskStopper(context);
+		updaterStarter = new UpdaterTaskStarter(context);
+		updaterStopper = new UpdaterTaskStopper(context);
 	}
 	
+	// Used only for intercepting device boot up
 	@Override
-	public void onReceive(Context context, Intent intent) {
-		new TaskManager(context).startInLoop();
+	public void onReceive(Context context, Intent intent) {	
+		if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+			new TaskManager(context).scheduleTasks();
+        }
 	}
 	
-	public void startInLoop() {		
-		startUpdaterInLoop();
-		startMonitorInLoop();
+	public void scheduleTasks() {
+		cancelUpdaterTask();
+		setupUpdaterTask();
+		cancelMonitorTask();
+		setupMonitorTask();
 	}
 	
-	private void startUpdaterInLoop() {
-		Intent updaterIntent = new Intent(context, StolenBikeUpdater.class);
-		PendingIntent updater = PendingIntent.getBroadcast(context, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.UPDATER.UPDATE_FREQUENCY, updater);		
+	private void cancelUpdaterTask() {
+		updaterStopper.stop();
 	}
 	
-	private void startMonitorInLoop() {
-		Intent monitorIntent = new Intent(context, StolenBikeMonitor.class);
-		PendingIntent monitor = PendingIntent.getBroadcast(context, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP , 0, Settings.MONITOR.SEARCH_FREQUENCY, monitor);
+	private void cancelMonitorTask() {
+		monitorStopper.stop();
 	}
 
-
+	private void setupUpdaterTask() {
+		updaterStarter.start();		
+	}
+	
+	private void setupMonitorTask() {
+		monitorStarter.startRepeating();
+	}
 }

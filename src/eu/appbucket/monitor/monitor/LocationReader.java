@@ -37,7 +37,7 @@ public class LocationReader {
 	    public void onProviderDisabled(String provider) {}
 	 };
 	 
-	public void start(Context context) {
+	public void start() {
 		// Getting a fast fix with the last known location
 		Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		setCurrentBestLocation(lastKnownLocation);
@@ -46,7 +46,7 @@ public class LocationReader {
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 	}
 	
-	public void stop(Context context) {
+	public void stop() {
 		locationManager.removeUpdates(locationListener);
 	}
 
