@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,19 +30,60 @@ import eu.appbucket.monitor.monitor.BikeBeacon;
 public class UpdaterTask extends BroadcastReceiver {
 
 	private Context context;
-	private static final String DEBUG_TAG = "StolenBikeUpdater";
+	private static final String LOG_TAG = "UpdaterTask";
+	
+	private class UpdaterTaskCommunicationError extends RuntimeException {
+		public UpdaterTaskCommunicationError(String errorMessage) {
+			super(errorMessage);
+		}
+		public UpdaterTaskCommunicationError(String errorMessage, Throwable throwable) {
+			super(errorMessage, throwable);
+		}
+	} 
+	
+	private class UpdaterTaskProcessingError extends RuntimeException {		
+		public UpdaterTaskProcessingError(String errorMessage, Throwable throwable) {
+			super(errorMessage, throwable);
+		}
+	} 
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {		
-		this.context = context;
-		showToast("Updating reported bikes ...");
-		if(isNetworkAvailable()) {
-			fetchStolenBikeData();
+		this.context = context;		
+		new ReportedBikesFetcher().execute();
+	}
+	
+	private class ReportedBikesFetcher extends AsyncTask<Void, Void, String> {	
+	
+		@Override
+		protected String doInBackground(Void... params) {
+			return fetchReportedBikesInBackground();
+		}
+		
+		@Override
+		protected void onPostExecute(String notification) {
+			new NotificationManager(context).showNotification(notification);
 		}
 	}
 	
-	private void showToast(String message) {
-		new NotificationManager(context).showNotification(message);
+	private String fetchReportedBikesInBackground() {
+		if(!isNetworkAvailable()) {
+			Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
+			return "Can't fetch reported bikes - network disabled.";
+		}
+		try {
+			String rawRecords = getRecordsRawData();
+			Set<BikeBeacon> reportedBikes = convertRawRecordsToSet(rawRecords);
+			resetReportedBikesDatabase();		
+	        populateReportedBikesDatabase(reportedBikes);
+	        return "Retrieved " + reportedBikes.size() + " reported bikes.";
+		} catch (UpdaterTaskCommunicationError e) {
+			Log.e(LOG_TAG, "Communication error: ", e);
+			return "Can't fetch reported bikes - communication problem.";
+		} catch (UpdaterTaskProcessingError e) {
+			Log.e(LOG_TAG, "Processing error: ", e);
+			return "Can't fetch reported bikes - data problem.";
+		}
 	}
 	
 	private boolean isNetworkAvailable() {
@@ -55,100 +95,69 @@ public class UpdaterTask extends BroadcastReceiver {
 	        return false;
 	    }
 	}
-	
-	private void fetchStolenBikeData() {
-		new DownloadStoleBikesTask(context).execute(Settings.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN");		
-	}	
-	
-	private class DownloadStoleBikesTask extends AsyncTask<String, Void, String> {
-		
-		private static final String DEBUG_TAG = "DownloadStoleBikesTask";
-		private Context context;
-		
-		public DownloadStoleBikesTask(Context context) {
-			this.context = context;
-		}		
-		
-		@Override
-		protected String doInBackground(String... urls) {
-			try {
-				return getData(urls[0]);	
-			} catch (IOException e) {
-				return "No results returned.";
-			}			
-		}
-		
-		private String getData(String myurl) throws IOException {
-			String contentAsString = "";
-			int len = 15000;
-			AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-			HttpGet request = new HttpGet(myurl);
-			request.setHeader("Content-Type", "application/json");
-			try {
-				HttpResponse response = client.execute(request);
-				int responseCode = response.getStatusLine().getStatusCode();
-				Log.d(DEBUG_TAG, "The response is: " + responseCode);
-				if(responseCode == HttpURLConnection.HTTP_OK) {
-					InputStream is = response.getEntity().getContent();
-			        // Convert the InputStream into a string
-			        contentAsString = readIt(is, len);	
-				}
-			} catch (IOException e) {
-				Log.e(DEBUG_TAG, "Can't retrieve list of stolen bikes: " + e.getMessage());
-			} finally {
-				client.close();
+
+	private String getRecordsRawData() throws UpdaterTaskCommunicationError {
+		String recordsUrl = Settings.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN";
+		String recordsAsJsonString = "";
+		int len = 15000;
+		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+		HttpGet request = new HttpGet(recordsUrl);
+		request.setHeader("Content-Type", "application/json");
+		try {
+			HttpResponse response = client.execute(request);
+			int responseCode = response.getStatusLine().getStatusCode();			
+			if(responseCode == HttpURLConnection.HTTP_OK) {
+				InputStream is = response.getEntity().getContent();
+		        recordsAsJsonString = convertInputStreamToString(is, len);	
+			} else {
+				throw new UpdaterTaskCommunicationError("Server responded with error code: + " + responseCode);
 			}
-			return contentAsString;
+		} catch (IOException e) {
+			throw new UpdaterTaskCommunicationError("Connection error", e);
+		} finally {
+			client.close();
 		}
-		
-		// Reads an InputStream and converts it to a String.
-		public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-		    Reader reader = null;
+		return recordsAsJsonString;
+	}
+	
+	public String convertInputStreamToString(InputStream stream, int len) throws UpdaterTaskProcessingError {
+	    try {
+	    	Reader reader = null;
 		    reader = new InputStreamReader(stream, "UTF-8");        
 		    char[] buffer = new char[len];
 		    reader.read(buffer);
 		    return new String(buffer);
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			cleanStolenBikeData();
-			Set<BikeBeacon> stolenBikes = processResult(result);
-	        storeStolenBikeData(stolenBikes);
-		}
-		
-		private Set<BikeBeacon> processResult(String result) {
-			Set<BikeBeacon> stolenBikes = new HashSet<BikeBeacon>(); 
-			try {
-				JSONArray jsonArray = new JSONArray(result);
-				for (int i = 0; i < jsonArray.length(); i++) {
-			        JSONObject explrObject = jsonArray.getJSONObject(i);
-			        stolenBikes.add(
-			        		new BikeBeacon(
-			        				explrObject.getInt("assetId"), 
-			        				explrObject.getString("uuid"), 
-			        				explrObject.getInt("major"), 
-			        				explrObject.getInt("minor")));			        
-				}
-			} catch (JSONException e) {
-				Log.e(DEBUG_TAG, "Can't process stolen bikes");
+		} catch (IOException e) {
+			throw new UpdaterTaskProcessingError("Can't convert input data to string.", e);
+		}		
+	}
+	
+	private Set<BikeBeacon> convertRawRecordsToSet(String result) {
+		Set<BikeBeacon> stolenBikes = new HashSet<BikeBeacon>(); 
+		try {
+			JSONArray jsonArray = new JSONArray(result);
+			for (int i = 0; i < jsonArray.length(); i++) {
+		        JSONObject explrObject = jsonArray.getJSONObject(i);
+		        stolenBikes.add(
+		        		new BikeBeacon(
+		        				explrObject.getInt("assetId"), 
+		        				explrObject.getString("uuid"), 
+		        				explrObject.getInt("major"), 
+		        				explrObject.getInt("minor")));			        
 			}
-			return stolenBikes;
+		} catch (JSONException e) {
+			Log.e(LOG_TAG, "Can't process stolen bikes");
 		}
-		
-		private void showToast(Context context, String message) {
-			new NotificationManager(context).showNotification(message);
-		}
-		
-		private void storeStolenBikeData(Set<BikeBeacon> stolenBikes) {			
-			for (BikeBeacon record : stolenBikes) {
-				new StolenBikeDao().addStolenBikeRecord(context, record);
-			}
-			showToast(context, "Registered " + stolenBikes.size() + " stolen bikes");		
-		}
-		
-		private void cleanStolenBikeData() {
-			new StolenBikeDao().resetStolenBikes(context);
-		}
+		return stolenBikes;
+	}
+	
+	private void populateReportedBikesDatabase(Set<BikeBeacon> stolenBikes) {			
+		for (BikeBeacon record : stolenBikes) {
+			new StolenBikeDao().addStolenBikeRecord(context, record);
+		}		
+	}
+	
+	private void resetReportedBikesDatabase() {
+		new StolenBikeDao().resetStolenBikes(context);
 	}
 }
