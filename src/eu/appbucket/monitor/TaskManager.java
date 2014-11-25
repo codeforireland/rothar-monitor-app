@@ -19,6 +19,7 @@ public class TaskManager extends BroadcastReceiver {
 	}
 	
 	public TaskManager(Context context) {
+		this.context = context;
 		alarmMgr = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
 		Intent monitorIntent = new Intent(context, MonitorTask.class);
 		monitorTask = PendingIntent.getBroadcast(context, 0, monitorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
