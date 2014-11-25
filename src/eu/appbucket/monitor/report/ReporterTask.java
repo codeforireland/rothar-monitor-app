@@ -25,10 +25,22 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 public class ReporterTask {
 
 	private Context context;
-	private static final String DEBUG_TAG = "ReporterTask";
+	private static final String LOG_TAG = "ReporterTask";
 	private final Set<BikeBeacon> foundBeacons = new HashSet<BikeBeacon>();
 	private LocationReader locationUpdater;
 	private Handler mHandler;
+	
+	private class ReporterTaskProcessingError extends RuntimeException {		
+		public ReporterTaskProcessingError(String errorMessage, Throwable throwable) {
+			super(errorMessage, throwable);
+		}
+	} 
+	
+	private class ReporterTaskCommunicationError extends RuntimeException {		
+		public ReporterTaskCommunicationError(String errorMessage, Throwable throwable) {
+			super(errorMessage, throwable);
+		}
+	} 
 	
 	public ReporterTask(Context context) {
 		this.context = context;
@@ -37,12 +49,12 @@ public class ReporterTask {
 	}
 	
 	public void store(BikeBeacon foundBacon) {
-		Log.d(DEBUG_TAG, "Adding beacon: " + foundBacon.getMinor() + " to report.");
+		Log.d(LOG_TAG, "Adding beacon: " + foundBacon.getMinor() + " to report " + Thread.currentThread().getId());
 		this.foundBeacons.add(foundBacon);
 	}
 
 	public void report() {
-		Log.d(DEBUG_TAG, "Finding current location ...");
+		Log.d(LOG_TAG, "Finding current location ..." + Thread.currentThread().getId());
 		mHandler = new Handler();
 		mHandler.postDelayed(new Runnable() {
 			@Override
@@ -50,69 +62,78 @@ public class ReporterTask {
 				startReporting();
 			}
 		}, Settings.REPORTER_TASK.DURATION);
-		
 	}
 	
 	private void startReporting() {
+		Log.d(LOG_TAG, "Starting reporting " +  + Thread.currentThread().getId());
 		locationUpdater.stop();
 		Location reportLocation = locationUpdater.getCurrentBestLocation();
 		for(BikeBeacon beacon: foundBeacons) {
-			Log.d(DEBUG_TAG, "Reporting beacon: " + beacon.getMinor() + "...");
+			Log.d(LOG_TAG, "Reporting beacon: " + beacon.getMinor() + "...");
 			ReportData report = new ReportData();
 			report.setAssetId(beacon.getAssetId());
 			report.setLatitude(reportLocation.getLatitude());
 			report.setLongitude(reportLocation.getLongitude());
 			new ReportStoleBikesTask().execute(report);
 		}
-		Log.d(DEBUG_TAG, "Done");
 	}
 	
-	private void showToast(String message) {
-		new NotificationManager(context).showNotification(message);
-	}
-	
-	private class ReportStoleBikesTask extends
-			AsyncTask<ReportData, Void, Void> {
-		ReportData report;
+	private class ReportStoleBikesTask extends AsyncTask<ReportData, Void, String> {
+		
 		@Override
-		protected Void doInBackground(ReportData... reports) {
-			try {
-				report = reports[0];
-				postReport(report);
-			} catch (IOException | JSONException e) {
-				Log.e(DEBUG_TAG, "Can't post the report: " + e.getMessage());
-			}
-			return null;
+		protected String doInBackground(ReportData... reports) {
+			return postStolenBikeReportInTheBackground(reports[0]);
 		}
 		
 		@Override
-		protected void onPostExecute(Void result) {
-			showToast("Report sent for bike id: " + report.getAssetId());
+		protected void onPostExecute(String message) {
+			new NotificationManager(context).showNotification(message);
 		}
 	}
-
-	private void postReport(ReportData report) throws IOException,
-			JSONException {
+	
+	private String postStolenBikeReportInTheBackground(ReportData report) throws ReporterTaskProcessingError {
+		try {
+			postStolenBikeReport(report);
+			return "Report sent for bike id: " + report.getAssetId();
+		} catch (ReporterTaskProcessingError e) {
+			Log.e(LOG_TAG, "Processing report data failed.", e);
+			return "Can't process report for bike id: " + report.getAssetId();
+		} catch (ReporterTaskCommunicationError e) {
+			Log.e(LOG_TAG, "Processing report data failed.", e);
+			return "Can't sent report for bike id: " + report.getAssetId();
+		}
+	}
+	
+	private void postStolenBikeReport(ReportData report) throws ReporterTaskProcessingError, ReporterTaskCommunicationError {
+		String payload = convertJsonToString(report);
+		String url = Settings.SERVER_URL + "/v3/assets/" + report.getAssetId() + "/reports";
+		postDataToUrl(payload, url);
+	}
+	
+	private String convertJsonToString(ReportData report) throws ReporterTaskProcessingError {
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("assetId", report.getAssetId());
-		jsonObj.put("latitude", report.getLatitude());
-		jsonObj.put("longitude", report.getLongitude());
-		String payload = jsonObj.toString();
+		try {
+			jsonObj.put("assetId", report.getAssetId());
+			jsonObj.put("latitude", report.getLatitude());
+			jsonObj.put("longitude", report.getLongitude());
+		} catch (JSONException e) {
+			new ReporterTaskProcessingError("Can't convert report data to json object.", e);
+		}
+		return jsonObj.toString();
+	}
+	
+	private void postDataToUrl(String payload, String url) throws ReporterTaskCommunicationError {
 		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-		HttpPost request = new HttpPost(Settings.SERVER_URL + "/v3/assets/"
-				+ report.getAssetId() + "/reports");
-		HttpResponse response = null;
+		HttpPost request = new HttpPost(url);
 		request.setHeader("Content-Type", "application/json");
 		try {
 			StringEntity se = new StringEntity(payload);
 			se.setContentEncoding("UTF-8");
 			se.setContentType("application/json");
 			request.setEntity(se);
-			response = client.execute(request);
-			Log.d(DEBUG_TAG, "Report sent with response: "
-					+ response.getStatusLine().getStatusCode());
+			client.execute(request);
 		} catch (IOException e) {
-			Log.e(DEBUG_TAG, "Can't send the report: " + e.getMessage());
+			throw new ReporterTaskCommunicationError("Communication error. ", e);
 		} finally {
 			client.close();
 		}

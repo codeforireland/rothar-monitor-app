@@ -1,7 +1,8 @@
 package eu.appbucket.monitor.monitor;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,57 +11,56 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.widget.Toast;
 import eu.appbucket.monitor.NotificationManager;
 import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.report.ReporterTask;
 import eu.appbucket.monitor.update.StolenBikeDao;
 
 public class MonitorTask extends BroadcastReceiver {
-
-	@Override
-	public void onReceive(final Context context, Intent intent) {
-		run(context);
-	}
 	
 	private Context context;
-	private static final String DEBUG_TAG = "MonitorTask";
+	private static final String LOG_TAG = "MonitorTask";
 	private BluetoothManager bluetoothManager;
-	private BluetoothAdapter mBluetoothAdapter;
-	private BluetoothAdapter.LeScanCallback mLeScanCallback;
-	private Handler mHandler;
-	private boolean mScanning;
-	private Set<BikeBeacon> beaconsFound = new HashSet<BikeBeacon>();
+	private BluetoothAdapter bluetoothAdapter;
+	private BluetoothAdapter.LeScanCallback scanCallback;
+	private Handler delayedExecutionHandler;
+	private Collection<BikeBeacon> foundBeacons = Collections.synchronizedCollection(new HashSet<BikeBeacon>());
 	
-	private void run(Context context) {
-		setup(context);
-		start();
+	@Override
+	public void onReceive(final Context context, Intent intent) {
+		this.context = context;
+		scanForStolenBikes();
+	}
+	
+	private String scanForStolenBikes() {
+		setupScanner();
+		startScanner();
+		return null;
 	}
 
-	private void setup(Context context) {
-		this.context = context;
+	private void setupScanner() {
 		bluetoothManager = (BluetoothManager) 
 				context.getSystemService(Context.BLUETOOTH_SERVICE);
-		mHandler = new Handler();
-		mBluetoothAdapter = bluetoothManager.getAdapter();
-		mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+		delayedExecutionHandler = new Handler();
+		bluetoothAdapter = bluetoothManager.getAdapter();
+		scanCallback = new BluetoothAdapter.LeScanCallback() {
 			@Override
-			public void onLeScan(BluetoothDevice device, int rssi,
-					byte[] scanRecord) {
-				processRecord(scanRecord);
+			public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+				processFoundBeaconRecord(scanRecord);
 			}
 		};
 	}
 	
-	private void processRecord(byte[] scanRecord) {
+	private void processFoundBeaconRecord(byte[] scanRecord) {
 		BeaconRecordParser parser = new BeaconRecordParser(scanRecord);
-		if(parser.isRecordValid()) {
-			BikeBeacon beacon = parser.parserRecordToBeacon();
-			if(isSupportedBySystem(beacon)) {
-				beacon = findInStolenBikes(beacon);
-				if(beacon.getAssetId() != null) {
-					beaconsFound.add(beacon);	
-				}
+		if(!parser.isRecordValid()) {
+			return;
+		}
+		BikeBeacon beacon = parser.parserRecordToBeacon();
+		if(isSupportedBySystem(beacon)) {
+			beacon = findInStolenBikes(beacon);
+			if(beacon.getAssetId() != null) {
+				foundBeacons.add(beacon);
 			}
 		}
 	}
@@ -79,43 +79,36 @@ public class MonitorTask extends BroadcastReceiver {
 		return beacon;
 	}
 	
-	private void start() {
-		showToast("Searching stolen bikes ...");
-		scanLeDevice(true);
+	private void startScanner() {
+		scanForBeacons();
 	}
 		
-	private void showToast(String message) {
-		new NotificationManager(context).showNotification(message);
-	}
-
-	private void scanLeDevice(final boolean enable) {
-		if (enable) {
-			// Stops scanning after a pre-defined scan period.
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					stop();
-				}
-			}, Settings.MONITOR_TASK.DURATION);
-			mScanning = true;
-			mBluetoothAdapter.startLeScan(mLeScanCallback);
-		} else {
-			mScanning = false;
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
-		}
+	private void scanForBeacons() {
+		// Stops scanning after a pre-defined scan period.
+		delayedExecutionHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				stopScanner();
+			}
+		}, Settings.MONITOR_TASK.DURATION);
+		bluetoothAdapter.startLeScan(scanCallback);
 	}
 	
-	private void stop() {
-		mScanning = false;
-		mBluetoothAdapter.stopLeScan(mLeScanCallback);
-		if(beaconsFound.size() == 0) {
+	private void stopScanner() {
+		bluetoothAdapter.stopLeScan(scanCallback);
+		if(foundBeacons.size() == 0) {
 			showToast("No stolen bikes found.");	
 		} else {
+			showToast("Found " + foundBeacons.size() + " stolen bike(s).");
 			ReporterTask reporter = new ReporterTask(context);
-			for(BikeBeacon beacon: beaconsFound) {
+			for(BikeBeacon beacon: foundBeacons) {
 				reporter.store(beacon);
 			}
 			reporter.report();
 		}
+	}
+	
+	private void showToast(String message) {
+		new NotificationManager(context).showNotification(message);
 	}
 }

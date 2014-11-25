@@ -17,9 +17,17 @@ import android.widget.CheckBox;
 public class MainActivity extends Activity {
 	
 	private int REQUEST_ENABLE_BT = 1;
+	private static final String LOG_TAG = "MainActivity";
+	
+	public long getThreadId() {
+		Thread t = Thread.currentThread();
+		long id = t.getId();
+		return id;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.d(LOG_TAG, "[MainActivity.onCreate] " + getThreadId());
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		checkIfBluetoothIsEnabled();

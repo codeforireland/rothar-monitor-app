@@ -69,14 +69,14 @@ public class UpdaterTask extends BroadcastReceiver {
 	private String fetchReportedBikesInBackground() {
 		if(!isNetworkAvailable()) {
 			Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
-			return "Can't fetch reported bikes - network disabled.";
+			return "Can't fetch registered bikes - network disabled.";
 		}
 		try {
 			String rawRecords = getRecordsRawData();
 			Set<BikeBeacon> reportedBikes = convertRawRecordsToSet(rawRecords);
 			resetReportedBikesDatabase();		
 	        populateReportedBikesDatabase(reportedBikes);
-	        return "Retrieved " + reportedBikes.size() + " reported bikes.";
+	        return "Registered " + reportedBikes.size() + " stolen bikes.";
 		} catch (UpdaterTaskCommunicationError e) {
 			Log.e(LOG_TAG, "Communication error: ", e);
 			return "Can't fetch reported bikes - communication problem.";
@@ -96,7 +96,7 @@ public class UpdaterTask extends BroadcastReceiver {
 	    }
 	}
 
-	private String getRecordsRawData() throws UpdaterTaskCommunicationError {
+	private String getRecordsRawData() throws UpdaterTaskCommunicationError, UpdaterTaskProcessingError {
 		String recordsUrl = Settings.SERVER_URL + "/v3/assets?limit=100&offset=0&status=STOLEN";
 		String recordsAsJsonString = "";
 		int len = 15000;
