@@ -1,62 +1,78 @@
 package eu.appbucket.monitor;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences.Editor;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 
 public class MainActivity extends Activity {
 	
-	private int REQUEST_ENABLE_BT = 1;
 	private static final String LOG_TAG = "MainActivity";
-	
-	public long getThreadId() {
-		Thread t = Thread.currentThread();
-		long id = t.getId();
-		return id;
-	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(LOG_TAG, "[MainActivity.onCreate] " + getThreadId());
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		checkIfBluetoothIsEnabled();
-		setupShowNotificationCheckbox();
+		if(!isBluetoothEnabled()) {
+			showEnableBluetoothDialog();	
+		} else if(!isNetworkingEnabled()) {
+			showEnableNetworkinDialog();
+		} else {
+			setupShowNotificationCheckbox();
+			runBackgroundTasks();	
+		}	
 	}
-	
-	private void checkIfBluetoothIsEnabled() {
+
+	private boolean isBluetoothEnabled() {
 		BluetoothManager bluetoothManager = (BluetoothManager) 
 				MainActivity.this.getSystemService(Context.BLUETOOTH_SERVICE);
 		BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
-		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		} else {
-			new TaskManager(MainActivity.this).scheduleTasks();
+		if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+			return true;
 		}
+		return false;
 	}
 	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    // Check which request we're responding to
-	    if (requestCode == REQUEST_ENABLE_BT) {
-	        // Make sure the request was successful
-	        if (resultCode == RESULT_OK) {
-	        	new TaskManager(MainActivity.this).scheduleTasks();
-	        } else {
-	        	this.finish();
-	        }
-	    }		
+	private void showEnableBluetoothDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setMessage(R.string.bluetooth_dialog_message).setTitle(R.string.bluetooth_dialog_title);
+	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	        	   MainActivity.this.finish();
+	           }
+	       });
+	    AlertDialog dialog = builder.create();
+	    dialog.show();
+	}	
+	
+	private boolean isNetworkingEnabled() {
+		ConnectivityManager connec = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo wifi = connec.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	    NetworkInfo mobile = connec.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);	
+	    if (wifi.isConnected() || mobile.isConnected()) {
+	    	return true;
+	    }
+	    return false;	    
+	}
+	
+	private void showEnableNetworkinDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setMessage(R.string.networking_dialog_message).setTitle(R.string.networking_dialog_title);
+	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	        	   MainActivity.this.finish();
+	           }
+	       });
+	    AlertDialog dialog = builder.create();
+	    dialog.show();
 	}
 	
 	private void setupShowNotificationCheckbox() {
@@ -77,25 +93,7 @@ public class MainActivity extends Activity {
 		);
 	}
 	
-
-	
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	private void runBackgroundTasks() {
+		new TaskManager(MainActivity.this).scheduleTasks();
 	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	*/
 }
