@@ -32,10 +32,9 @@ public class MonitorTask extends BroadcastReceiver {
 		scanForStolenBikes();
 	}
 	
-	private String scanForStolenBikes() {
+	private void scanForStolenBikes() {
 		setupScanner();
 		startScanner();
-		return null;
 	}
 
 	private void setupScanner() {
