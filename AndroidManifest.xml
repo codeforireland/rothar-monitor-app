@@ -33,7 +33,7 @@
     <receiver android:name="eu.appbucket.monitor.monitor.MonitorTask" />
     <receiver android:name="eu.appbucket.monitor.monitor.MonitorTaskStarter" />
     <receiver android:name="eu.appbucket.monitor.monitor.MonitorTaskStopper" />
-    <receiver android:name="eu.appbucket.monitor.TaskManager"
+    <receiver android:name="eu.appbucket.monitor.scheduler.TaskManager"
         android:enabled="true">
 	    <intent-filter>
 	        <action android:name="android.intent.action.BOOT_COMPLETED"></action>

@@ -1,5 +1,6 @@
 package eu.appbucket.monitor;
 
+import eu.appbucket.monitor.scheduler.TaskManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;

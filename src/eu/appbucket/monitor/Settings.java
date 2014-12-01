@@ -13,6 +13,14 @@ public class Settings {
 	public static final int ONE_MINUTE = 60 * 1000;
 	public static final int ONE_HOUR = 60 * ONE_MINUTE;
 	
+	public final static class START_TASK {
+		public final static long FREQUENCY = 24 * ONE_HOUR;
+	}
+	
+	public final static class FINISH_TASK {
+		public final static long FREQUENCY = 24 * ONE_HOUR;
+	}
+	
 	public final static class MONITOR_TASK {
 		public final static long DURATION = 10 * ONE_SECOND;
 		private final static long FREQUENCY_PROD = 30 * ONE_MINUTE;
@@ -23,7 +31,7 @@ public class Settings {
 	public final static class UPDATER_TASK {
 		private final static long FREQUENCY_PROD = 60 * ONE_MINUTE;
 		private final static long FREQUENCY_DEV = 1 * ONE_MINUTE;
-		public final static long FREQUENCY = FREQUENCY_DEV;
+		public final static long FREQUENCY = FREQUENCY_PROD;
 	}
 	
 	public final static class REPORTER_TASK {
