@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 import eu.appbucket.monitor.NotificationManager;
 import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.report.ReporterTask;
@@ -65,8 +66,8 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private  boolean isSupportedBySystem(BikeBeacon beacon) {
-		if(beacon.getUudi().equals(Settings.IBEACON.IBEACON_UUID) 
-				&& beacon.getMajor() == Settings.IBEACON.IBEACON_MAJOR) {
+		if(beacon.getUudi().equals(Settings.SYSTEM_IBEACON.UUID) 
+				&& beacon.getMajor() == Settings.SYSTEM_IBEACON.MAJOR) {
 			return true;
 		}
 		return false;
@@ -79,6 +80,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void startScanner() {
+		Log.d(LOG_TAG, "Starting scanner.");
 		scanForBeacons();
 	}
 		
@@ -94,6 +96,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void stopScanner() {
+		Log.d(LOG_TAG, "Stopping scanner.");
 		bluetoothAdapter.stopLeScan(scanCallback);
 		if(foundBeacons.size() == 0) {
 			showToast("No stolen bikes found.");	

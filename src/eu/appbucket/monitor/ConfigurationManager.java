@@ -1,5 +1,7 @@
 package eu.appbucket.monitor;
 
+import java.util.UUID;
+
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
@@ -32,4 +34,26 @@ public class ConfigurationManager {
 							Settings.SHOW_NOTIFICATIONS_DEFAULT_VALUE);
 		return showNotifcationsEnabled;
 	}
+	
+	public String getApplicationUuid() {
+		String applicationUuid = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+			.getString(Settings.APPLICATION_UUID_PREF_NAME, null);
+		if(applicationUuid != null) {
+			return applicationUuid;
+		}
+		applicationUuid = generateApplicationUuid();
+		saveApplicationUuid(applicationUuid);
+		return applicationUuid;
+	}
+	
+	public String generateApplicationUuid() {
+		return UUID.randomUUID().toString().toUpperCase();
+	}
+	
+	public void saveApplicationUuid(String appUuid) {
+		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		editor.putString(Settings.APPLICATION_UUID_PREF_NAME, appUuid);
+		editor.commit();
+	}
+	
 }

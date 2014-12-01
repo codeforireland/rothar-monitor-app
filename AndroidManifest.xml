@@ -31,8 +31,8 @@
         </activity>
     <receiver android:name="eu.appbucket.monitor.update.UpdaterTask" />    
     <receiver android:name="eu.appbucket.monitor.monitor.MonitorTask" />
-    <receiver android:name="eu.appbucket.monitor.monitor.MonitorTaskStarter" />
-    <receiver android:name="eu.appbucket.monitor.monitor.MonitorTaskStopper" />
+    <receiver android:name="eu.appbucket.monitor.scheduler.StartTask" />
+    <receiver android:name="eu.appbucket.monitor.scheduler.StopTask" />
     <receiver android:name="eu.appbucket.monitor.scheduler.TaskManager"
         android:enabled="true">
 	    <intent-filter>

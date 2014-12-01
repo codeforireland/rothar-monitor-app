@@ -16,6 +16,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import eu.appbucket.monitor.ConfigurationManager;
 import eu.appbucket.monitor.NotificationManager;
 import eu.appbucket.monitor.Settings;
 import eu.appbucket.monitor.monitor.BikeBeacon;
@@ -29,6 +30,7 @@ public class ReporterTask {
 	private final Set<BikeBeacon> foundBeacons = new HashSet<BikeBeacon>();
 	private LocationReader locationUpdater;
 	private Handler mHandler;
+	private String applicationUuid;
 	
 	private class ReporterTaskProcessingError extends RuntimeException {		
 		public ReporterTaskProcessingError(String errorMessage, Throwable throwable) {
@@ -46,6 +48,7 @@ public class ReporterTask {
 		this.context = context;
 		locationUpdater = new LocationReader(context);
 		locationUpdater.start();
+		applicationUuid = new ConfigurationManager(context).getApplicationUuid();
 	}
 	
 	public void store(BikeBeacon foundBacon) {
@@ -74,6 +77,7 @@ public class ReporterTask {
 			report.setAssetId(beacon.getAssetId());
 			report.setLatitude(reportLocation.getLatitude());
 			report.setLongitude(reportLocation.getLongitude());
+			report.setReporterUuid(applicationUuid);
 			new ReportStoleBikesTask().execute(report);
 		}
 	}
@@ -116,6 +120,7 @@ public class ReporterTask {
 			jsonObj.put("assetId", report.getAssetId());
 			jsonObj.put("latitude", report.getLatitude());
 			jsonObj.put("longitude", report.getLongitude());
+			jsonObj.put("reporter_uuid", report.getReporterUuid());
 		} catch (JSONException e) {
 			new ReporterTaskProcessingError("Can't convert report data to json object.", e);
 		}

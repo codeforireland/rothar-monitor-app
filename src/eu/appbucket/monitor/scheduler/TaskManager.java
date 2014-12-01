@@ -10,11 +10,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.Settings.FINISH_TASK;
+import eu.appbucket.monitor.Settings.STOP_TASK;
 import eu.appbucket.monitor.Settings.START_TASK;
 import eu.appbucket.monitor.monitor.MonitorTask;
-import eu.appbucket.monitor.monitor.StartTask;
-import eu.appbucket.monitor.monitor.StopTask;
 import eu.appbucket.monitor.update.UpdaterTask;
 
 public class TaskManager extends BroadcastReceiver {
@@ -37,10 +35,11 @@ public class TaskManager extends BroadcastReceiver {
 		Intent updaterIntent = new Intent(context, UpdaterTask.class);
 		updaterTask = PendingIntent.getBroadcast(context, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		// monitor
-		startTimes.add(new HourMinute(8, 0));
-		startTimes.add(new HourMinute(17, 0));
-		stopTimes.add(new HourMinute(9, 30));
-		stopTimes.add(new HourMinute(18, 30));
+		startTimes.add(new HourMinute(8, 30));
+		stopTimes.add(new HourMinute(23, 50));
+		/*stopTimes.add(new HourMinute(9, 30));
+		startTimes.add(new HourMinute(17, 00));
+		stopTimes.add(new HourMinute(18, 00));*/
 	}
 	
 	// Used only for intercepting device boot up
@@ -130,7 +129,7 @@ public class TaskManager extends BroadcastReceiver {
 	
 	private void stopMonitorTaskAt(int hour, int minute) {		
 		alarmMgr.setInexactRepeating(
-				AlarmManager.RTC_WAKEUP, getTriggerAtMillis(hour, minute), FINISH_TASK.FREQUENCY, 
+				AlarmManager.RTC_WAKEUP, getTriggerAtMillis(hour, minute), STOP_TASK.FREQUENCY, 
 				getStopTaskForHourAndMinute(hour, minute));
 	}
 	

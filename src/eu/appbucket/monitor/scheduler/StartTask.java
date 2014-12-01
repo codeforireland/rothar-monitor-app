@@ -1,17 +1,20 @@
-package eu.appbucket.monitor.monitor;
+package eu.appbucket.monitor.scheduler;
 
 import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.scheduler.TaskManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class StartTask extends BroadcastReceiver {
 
+	private static final String LOG_TAG = "StartTask";
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.d(LOG_TAG, "Starting task.");
 		startMonitorTask(context);			
 	}
 	
