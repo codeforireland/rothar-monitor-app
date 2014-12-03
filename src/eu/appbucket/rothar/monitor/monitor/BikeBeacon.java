@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.monitor;
+package eu.appbucket.rothar.monitor.monitor;
 
 public class BikeBeacon {
 

@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.update;
+package eu.appbucket.rothar.monitor.update;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +23,9 @@ import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.appbucket.monitor.NotificationManager;
-import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.monitor.BikeBeacon;
+import eu.appbucket.rothar.common.NotificationManager;
+import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 
 public class UpdaterTask extends BroadcastReceiver {
 

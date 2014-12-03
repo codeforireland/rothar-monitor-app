@@ -1,10 +1,10 @@
-package eu.appbucket.monitor.update;
+package eu.appbucket.rothar.monitor.update;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import eu.appbucket.monitor.monitor.BikeBeacon;
+import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 
 public class StolenBikeDao {
 	

@@ -5,25 +5,22 @@
     
     <string name="page_info">To register you bike please go to:</string>
     <string name="page_url">dev.rothar.appbucket.eu</string>
-    
     <string name="app_info">This application is responsible for finding and reporting stolen bicycles.
     Please do not uninstall so you help us find more stolen bicycles.
     It runs in the background and use minimal resources.</string>
-    
     <string name="contact_info">To buy tags or send feedback please email to:</string>
     <string name="contact_mail">rotharapp@gmail.com</string>
-    
     <string name="action_settings">Settings</string>
-    
     <string name="settings">Settings:</string>
-    
     <string name="show_notifications">Show notifications</string>
-    
     <string name="bluetooth_dialog_title">Bluetooth disabled ?</string>
     <string name="bluetooth_dialog_message">Please enable bluetooth.</string>
-    
     <string name="networking_dialog_title">Networking disabled ?</string>
     <string name="networking_dialog_message">Please enable wifi or mobile data.</string>
+    <string name="ok">OK</string>
+    <string name="title_activity_register">Rothar</string>
+    <string name="hello_world">Hello world!</string>
     
-    <string name="ok">OK</string>    
+	<string name="register_button">Register</string>
+	<string name="tag_code_hint">Tag code</string>
 </resources>

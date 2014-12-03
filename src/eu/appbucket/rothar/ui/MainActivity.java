@@ -1,6 +1,5 @@
-package eu.appbucket.monitor;
+package eu.appbucket.rothar.ui;
 
-import eu.appbucket.monitor.scheduler.TaskManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -13,6 +12,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
+import eu.appbucket.rothar.R;
+import eu.appbucket.rothar.common.ConfigurationManager;
+import eu.appbucket.rothar.monitor.scheduler.TaskManager;
 
 public class MainActivity extends Activity {
 	

@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.scheduler;
+package eu.appbucket.rothar.monitor.scheduler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,11 +9,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.Settings.STOP_TASK;
-import eu.appbucket.monitor.Settings.START_TASK;
-import eu.appbucket.monitor.monitor.MonitorTask;
-import eu.appbucket.monitor.update.UpdaterTask;
+import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.common.Settings.START_TASK;
+import eu.appbucket.rothar.common.Settings.STOP_TASK;
+import eu.appbucket.rothar.monitor.monitor.MonitorTask;
+import eu.appbucket.rothar.monitor.update.UpdaterTask;
 
 public class TaskManager extends BroadcastReceiver {
 

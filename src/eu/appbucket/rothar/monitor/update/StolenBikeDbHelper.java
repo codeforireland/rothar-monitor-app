@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.update;
+package eu.appbucket.rothar.monitor.update;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

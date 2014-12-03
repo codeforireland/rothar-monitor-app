@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.scheduler;
+package eu.appbucket.rothar.monitor.scheduler;
 
 public class HourMinute {
 	

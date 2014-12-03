@@ -1,6 +1,6 @@
-package eu.appbucket.monitor.scheduler;
+package eu.appbucket.rothar.monitor.scheduler;
 
-import eu.appbucket.monitor.Settings;
+import eu.appbucket.rothar.common.Settings;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

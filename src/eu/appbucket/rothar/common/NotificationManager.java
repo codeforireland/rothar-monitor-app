@@ -1,4 +1,4 @@
-package eu.appbucket.monitor;
+package eu.appbucket.rothar.common;
 
 import android.content.Context;
 import android.widget.Toast;

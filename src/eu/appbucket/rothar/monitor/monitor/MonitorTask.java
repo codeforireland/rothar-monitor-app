@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.monitor;
+package eu.appbucket.rothar.monitor.monitor;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,10 +12,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
-import eu.appbucket.monitor.NotificationManager;
-import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.report.ReporterTask;
-import eu.appbucket.monitor.update.StolenBikeDao;
+import eu.appbucket.rothar.common.NotificationManager;
+import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.monitor.report.ReporterTask;
+import eu.appbucket.rothar.monitor.update.StolenBikeDao;
 
 public class MonitorTask extends BroadcastReceiver {
 	

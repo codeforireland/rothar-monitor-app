@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.report;
+package eu.appbucket.rothar.monitor.report;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -16,11 +16,11 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
-import eu.appbucket.monitor.ConfigurationManager;
-import eu.appbucket.monitor.NotificationManager;
-import eu.appbucket.monitor.Settings;
-import eu.appbucket.monitor.monitor.BikeBeacon;
-import eu.appbucket.monitor.monitor.LocationReader;
+import eu.appbucket.rothar.common.ConfigurationManager;
+import eu.appbucket.rothar.common.NotificationManager;
+import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
+import eu.appbucket.rothar.monitor.monitor.LocationReader;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class ReporterTask {

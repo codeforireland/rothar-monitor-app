@@ -1,4 +1,4 @@
-package eu.appbucket.monitor.monitor;
+package eu.appbucket.rothar.monitor.monitor;
 
 import android.util.Log;
 
