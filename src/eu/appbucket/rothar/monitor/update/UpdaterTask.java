@@ -74,7 +74,7 @@ public class UpdaterTask extends BroadcastReceiver {
 		try {
 			String rawRecords = getRecordsRawData();
 			Set<BikeBeacon> reportedBikes = convertRawRecordsToSet(rawRecords);
-			resetReportedBikesDatabase();		
+			resetReportedBikesDatabase();
 	        populateReportedBikesDatabase(reportedBikes);
 	        return "Registered " + reportedBikes.size() + " stolen bikes.";
 		} catch (UpdaterTaskCommunicationError e) {

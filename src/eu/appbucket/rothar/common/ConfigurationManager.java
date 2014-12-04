@@ -55,5 +55,10 @@ public class ConfigurationManager {
 		editor.putString(Settings.APPLICATION_UUID_PREF_NAME, appUuid);
 		editor.commit();
 	}
-	
+
+	public void saveAssetId(int assetId) {
+		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		editor.putInt(Settings.ASSET_ID_PREF_NAME, assetId);
+		editor.commit();
+	}
 }

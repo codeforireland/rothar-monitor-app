@@ -21,6 +21,6 @@
     <string name="title_activity_register">Rothar</string>
     <string name="hello_world">Hello world!</string>
     
-	<string name="register_button">Register</string>
+	<string name="register_button">Activate tag</string>
 	<string name="tag_code_hint">Tag code</string>
 </resources>

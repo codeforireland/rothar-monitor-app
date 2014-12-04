@@ -44,4 +44,6 @@ public class Settings {
 	public final static boolean SHOW_NOTIFICATIONS_DEFAULT_VALUE = false;
 	
 	public final static String APPLICATION_UUID_PREF_NAME = "app-uuid";
+	
+	public final static String ASSET_ID_PREF_NAME = "asset-id";
 }
