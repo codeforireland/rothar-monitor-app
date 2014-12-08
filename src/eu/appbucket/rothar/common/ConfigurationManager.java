@@ -2,6 +2,8 @@ package eu.appbucket.rothar.common;
 
 import java.util.UUID;
 
+import eu.appbucket.rothar.web.domain.asset.AssetStatus;
+
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
@@ -13,31 +15,57 @@ public class ConfigurationManager {
 		this.context = context;
 	}
 	
-	public void enableNotifications() {
+	private Integer readIntiger(String nameOfItem, Integer defaultValue) {
+		Integer value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+				.getInt(nameOfItem, defaultValue);
+		return value;		
+	}
+
+	private void saveInteger(String nameOfItem, int valueToSave) {
 		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
-		editor.putBoolean(Settings.SHOW_NOTIFICATIONS_PREF_NAME, true);
+		editor.putInt(nameOfItem, valueToSave);
 		editor.commit();
 	}
 	
-	public void disableNotifications() {
-		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
-		editor.putBoolean(Settings.SHOW_NOTIFICATIONS_PREF_NAME, false);
-		editor.commit();
-	}
-	
-	public boolean isNotificationEnabled() {
-		boolean showNotifcationsEnabled = 
+	private boolean readBoolean(String nameOfItem, boolean defaultValu) {
+		boolean value = 
 				context
 					.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
 					.getBoolean(
+							nameOfItem, 
+							defaultValu);
+		return value;
+	}
+	
+	private void saveBoolean(String nameOfItem, boolean valueToSave) {
+		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		editor.putBoolean(nameOfItem, valueToSave);
+		editor.commit();
+	}
+
+	private String readString(String nameOfItem, String defaultValue) {
+		String value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+				.getString(nameOfItem, defaultValue);
+		return value;		
+	}
+	
+	public void enableNotifications() {
+		saveBoolean(Settings.SHOW_NOTIFICATIONS_PREF_NAME, true);
+	}
+	
+	public void disableNotifications() {
+		saveBoolean(Settings.SHOW_NOTIFICATIONS_PREF_NAME, false);
+	}
+	
+	public boolean isNotificationEnabled() {
+		boolean showNotifcationsEnabled = readBoolean(
 							Settings.SHOW_NOTIFICATIONS_PREF_NAME, 
 							Settings.SHOW_NOTIFICATIONS_DEFAULT_VALUE);
 		return showNotifcationsEnabled;
 	}
-	
+		
 	public String getApplicationUuid() {
-		String applicationUuid = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
-			.getString(Settings.APPLICATION_UUID_PREF_NAME, null);
+		String applicationUuid = readString(Settings.APPLICATION_UUID_PREF_NAME, null);
 		if(applicationUuid != null) {
 			return applicationUuid;
 		}
@@ -57,8 +85,20 @@ public class ConfigurationManager {
 	}
 
 	public void saveAssetId(int assetId) {
-		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
-		editor.putInt(Settings.ASSET_ID_PREF_NAME, assetId);
-		editor.commit();
+		saveInteger(Settings.ASSET_ID_PREF_NAME, assetId);
+	}
+	
+	public Integer getAssetId() {
+		return readIntiger(Settings.ASSET_ID_PREF_NAME, null);
+	}
+	
+	public AssetStatus getAssetStatus() {
+		int statusId = readIntiger(Settings.ASSET_STATUS_PREF_NAME, -1);
+		return AssetStatus.getStatusEnumById(statusId);
+	}
+	
+	public void setAssetStatus(AssetStatus status) {
+		int statusId = status.getStatusId();
+		saveInteger(Settings.ASSET_STATUS_PREF_NAME, statusId);
 	}
 }

@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
@@ -20,14 +21,42 @@ import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.ui.OperationResult.OPERATION_RESULT;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
-public class RegisterTask extends AsyncTask<String, Void, String> {
+class OperationResult {
+	
+	public enum OPERATION_RESULT {
+		SUCCESS,
+		FAILUR
+	}
+	
+	private String message;
+	private OPERATION_RESULT result;
+	
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
+	public void setResult(OPERATION_RESULT result) {
+		this.result = result;
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	
+	public OPERATION_RESULT getResult() {
+		return result;
+	}
+}
+
+public class RegisterTask extends AsyncTask<String, Void, OperationResult> {
 
 	private Context context;
 	private static final String LOG_TAG = "RegisterTask";
-	
+
 	public RegisterTask(Context context) {
 		this.context = context;
 	}
@@ -57,30 +86,39 @@ public class RegisterTask extends AsyncTask<String, Void, String> {
 	}
 	
 	@Override
-	protected String doInBackground(String... params) {
+	protected OperationResult doInBackground(String... params) {
 		return getAssetByTagCodeInTheBackgroupd(params[0]);
 	};
 	
-	private String getAssetByTagCodeInTheBackgroupd(String tagCode) {
+	private OperationResult getAssetByTagCodeInTheBackgroupd(String tagCode) {
+		OperationResult operationResult = new OperationResult();
+		operationResult.setResult(OPERATION_RESULT.FAILUR);
 		if(!isNetworkAvailable()) {
-			return "Can't activate tag because of network problem.";
+			operationResult.setResult(OPERATION_RESULT.FAILUR);
+			operationResult.setMessage("Can't activate tag because of network problem.");
+			return operationResult;
 		}
 		try {
 			String assetRawData = getAssetRawData(tagCode);
 			AssetData asset = convertRowDataToAsset(assetRawData);
-			saveAssetIntoPreferences(asset);	
-			return "Tag activated.";	
+			saveAssetIntoPreferences(asset);
+			operationResult.setResult(OPERATION_RESULT.SUCCESS);
+			operationResult.setMessage("Tag activated.");
 		} catch (RegisterTaskCommunicationError e) {
 			Log.e(LOG_TAG, "Communication error: ", e);
-			return "Can't activate tag because of communication problem.";
+			operationResult.setResult(OPERATION_RESULT.FAILUR);
+			operationResult.setMessage("Can't activate tag because of communication problem.");
 		} catch (RegisterTaskProcessingError e) {
 			Log.e(LOG_TAG, "Processing error: ", e);
-			return "Can't activate tag because of data problem.";
+			operationResult.setResult(OPERATION_RESULT.FAILUR);
+			operationResult.setMessage("Can't activate tag because of data problem.");
 		} catch(RegisterTaskServerError e) {
 			ErrorInfo error = convertRowDataToError(e.getMessage());
 			Log.e(LOG_TAG, "Server error: " + error.getDeveloperMessage());
-			return error.getClientMessage();
+			operationResult.setResult(OPERATION_RESULT.FAILUR);
+			operationResult.setMessage(error.getClientMessage());
 		}
+		return operationResult;
 	}
 	
 	private boolean isNetworkAvailable() {
@@ -165,7 +203,15 @@ public class RegisterTask extends AsyncTask<String, Void, String> {
 		new ConfigurationManager(context).saveAssetId(asset.getAssetId());
 	}
 	
-	protected void onPostExecute(String notification) {
-		Toast.makeText(context, notification, Toast.LENGTH_SHORT).show();
+	protected void onPostExecute(OperationResult result) {
+		Toast.makeText(context, result.getMessage(), Toast.LENGTH_SHORT).show();
+		if(result.getResult() == OPERATION_RESULT.SUCCESS) {
+			startTagActivity();
+		}
+	}
+	
+	private void startTagActivity() {
+		Intent intent = new Intent(context, TagActivity.class);
+		context.startActivity(intent);
 	}
 }

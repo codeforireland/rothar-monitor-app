@@ -7,7 +7,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import eu.appbucket.rothar.R;
 
-public class RegisterActivity extends Activity {
+public class RegistrationActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

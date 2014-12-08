@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Rothar</string>
-    
     <string name="page_info">To register you bike please go to:</string>
     <string name="page_url">dev.rothar.appbucket.eu</string>
     <string name="app_info">This application is responsible for finding and reporting stolen bicycles.
@@ -20,7 +19,8 @@
     <string name="ok">OK</string>
     <string name="title_activity_register">Rothar</string>
     <string name="hello_world">Hello world!</string>
-    
-	<string name="register_button">Activate tag</string>
-	<string name="tag_code_hint">Tag code</string>
+    <string name="register_button">Activate tag</string>
+    <string name="tag_code_hint">Tag code</string>
+    <string name="title_activity_tag">TagActivity</string>
+
 </resources>

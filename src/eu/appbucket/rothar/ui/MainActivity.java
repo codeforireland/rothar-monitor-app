@@ -6,12 +6,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.CheckBox;
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.monitor.scheduler.TaskManager;
@@ -29,8 +27,9 @@ public class MainActivity extends Activity {
 		} else if(!isNetworkingEnabled()) {
 			showEnableNetworkinDialog();
 		} else {
-			setupShowNotificationCheckbox();
-			runBackgroundTasks();	
+			// setupShowNotificationCheckbox();
+			runBackgroundTasks();
+			startAppriopriateActicity();
 		}	
 	}
 
@@ -78,7 +77,7 @@ public class MainActivity extends Activity {
 	    dialog.show();
 	}
 	
-	private void setupShowNotificationCheckbox() {
+	/*private void setupShowNotificationCheckbox() {
 		CheckBox showNotifcationsCheckbox = (CheckBox) findViewById(R.id.show_notifications);
 		final ConfigurationManager configuration = new ConfigurationManager(this);
 		showNotifcationsCheckbox.setChecked(configuration.isNotificationEnabled());
@@ -94,9 +93,26 @@ public class MainActivity extends Activity {
 					}
 			}
 		);
-	}
+	}*/
 	
 	private void runBackgroundTasks() {
 		new TaskManager(MainActivity.this).scheduleTasks();
+	}
+	
+	private void startAppriopriateActicity() {
+		if(new ConfigurationManager(this).getAssetId() == null) {
+			startRegistrationActivity();
+		} else {
+			startTagActivity();
+		}
+	}
+	private void startRegistrationActivity() {
+		Intent intent = new Intent(this, RegistrationActivity.class);
+		this.startActivity(intent);
+	}
+	
+	private void startTagActivity() {
+		Intent intent = new Intent(this, TagActivity.class);
+		this.startActivity(intent);
 	}
 }
