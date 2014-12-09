@@ -9,11 +9,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.net.http.AndroidHttpClient;
-import eu.appbucket.rothar.monitor.update.UpdaterTask.UpdaterTaskProcessingError;
 import eu.appbucket.rothar.ui.task.commons.OperationResult.OPERATION_RESULT;
+import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
 
 public class TaskCommons {
@@ -34,12 +35,12 @@ public class TaskCommons {
 			if(responseCode == HttpStatus.SC_OK) {
 				result.setResult(OPERATION_RESULT.SUCCESS);	
 			} else if (responseCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+				// TODO: cleanup this mess
 				result.setResult(OPERATION_RESULT.FAILUR);
-				result.setMessage("Server error.");
 				InputStream is = response.getEntity().getContent();
-		        String assetAsJsonString = convertInputStreamToString(is);
-		        JSONObject error = new JSONObject(assetAsJsonString);
-		        error.get
+		        String errorJsonString = convertInputStreamToString(is);
+		        ErrorInfo error = convertRowDataToError(errorJsonString);
+		        result.setMessage("Server error: " + error.getClientMessage());
 		    } else {
 				result.setResult(OPERATION_RESULT.FAILUR);
 				result.setMessage("Unknown error.");
@@ -64,5 +65,18 @@ public class TaskCommons {
 		} catch (IOException e) {
 			throw new TaskProcessingError("Can't convert input data to string.", e);
 		}		
+	}
+	
+	private static ErrorInfo convertRowDataToError(String result) {
+		ErrorInfo error = new ErrorInfo(); 
+		try {
+			JSONObject jsonObject = new JSONObject(result);
+			error = new ErrorInfo();
+			error.setClientMessage(jsonObject.getString("clientMessage"));
+			error.setDeveloperMessage(jsonObject.getString("developerMessage")); 			
+		} catch (JSONException e) {
+			// Log.e(LOG_TAG, "Can't process asset data.");
+		}
+		return error;
 	}
 }

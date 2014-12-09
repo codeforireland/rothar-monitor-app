@@ -3,6 +3,7 @@ package eu.appbucket.rothar.common;
 public class Settings {
 	
 	public final static String SERVER_URL = "http://api.dev.rothar.appbucket.eu"; // development machine
+	// public final static String SERVER_URL = "http://10.0.2.2:8080/Rothar";
 	
 	public final class SYSTEM_IBEACON {
 		public final static String UUID = "372295A7-CA90-6A84-7A29-5F472E4F7206";
