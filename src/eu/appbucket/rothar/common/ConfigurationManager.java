@@ -15,8 +15,8 @@ public class ConfigurationManager {
 		this.context = context;
 	}
 	
-	private Integer readIntiger(String nameOfItem, Integer defaultValue) {
-		Integer value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+	private int readIntiger(String nameOfItem, int defaultValue) {
+		int value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
 				.getInt(nameOfItem, defaultValue);
 		return value;		
 	}
@@ -89,7 +89,8 @@ public class ConfigurationManager {
 	}
 	
 	public Integer getAssetId() {
-		return readIntiger(Settings.ASSET_ID_PREF_NAME, null);
+		int value = readIntiger(Settings.ASSET_ID_PREF_NAME, -1);
+		return (value == -1 ? null : value);
 	}
 	
 	public AssetStatus getAssetStatus() {

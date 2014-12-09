@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ToggleButton;
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.ConfigurationManager;
+import eu.appbucket.rothar.ui.task.UpdateTask;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 

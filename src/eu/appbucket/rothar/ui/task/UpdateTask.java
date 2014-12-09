@@ -1,4 +1,4 @@
-package eu.appbucket.rothar.ui;
+package eu.appbucket.rothar.ui.task;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,9 +8,10 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.TaskCommons.OPERATION_RESULT;
-import eu.appbucket.rothar.ui.TaskCommons.OperationResult;
-import eu.appbucket.rothar.ui.task.TaskProcessingError;
+import eu.appbucket.rothar.ui.task.commons.OperationResult.OPERATION_RESULT;
+import eu.appbucket.rothar.ui.task.commons.OperationResult;
+import eu.appbucket.rothar.ui.task.commons.TaskCommons;
+import eu.appbucket.rothar.ui.task.commons.TaskProcessingError;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 
 public class UpdateTask extends AsyncTask<AssetData, Void, OperationResult> {
@@ -23,7 +24,7 @@ public class UpdateTask extends AsyncTask<AssetData, Void, OperationResult> {
 	}
 	
 	@Override
-	protected TaskCommons.OperationResult doInBackground(AssetData... params) {
+	protected OperationResult doInBackground(AssetData... params) {
 		return updateAssetInBackground(params[0]);
 	}
 	
@@ -31,7 +32,7 @@ public class UpdateTask extends AsyncTask<AssetData, Void, OperationResult> {
 		this.asset = asset;
 		String dataToSend = convertJsonToString(asset);
 		String url = Settings.SERVER_URL + "/v4/assets/" + asset.getAssetId();
-		return new TaskCommons().postDataToUrl(dataToSend, url);
+		return TaskCommons.postDataToUrl(dataToSend, url);
 	}
 	
 	private String convertJsonToString(AssetData asset) throws TaskProcessingError {

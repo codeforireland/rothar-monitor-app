@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import eu.appbucket.rothar.R;
+import eu.appbucket.rothar.ui.task.RegisterTask;
 
 public class RegistrationActivity extends Activity {
 

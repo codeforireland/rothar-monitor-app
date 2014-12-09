@@ -1,4 +1,4 @@
-package eu.appbucket.rothar.ui;
+package eu.appbucket.rothar.ui.task;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,8 @@ import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.OperationResult.OPERATION_RESULT;
+import eu.appbucket.rothar.ui.TagActivity;
+import eu.appbucket.rothar.ui.task.OperationResult.OPERATION_RESULT;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 

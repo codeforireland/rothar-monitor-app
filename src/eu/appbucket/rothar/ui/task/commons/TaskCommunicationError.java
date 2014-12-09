@@ -1,4 +1,4 @@
-package eu.appbucket.rothar.ui.task;
+package eu.appbucket.rothar.ui.task.commons;
 
 public class TaskCommunicationError extends RuntimeException {		
 	public TaskCommunicationError(String errorMessage, Throwable throwable) {
