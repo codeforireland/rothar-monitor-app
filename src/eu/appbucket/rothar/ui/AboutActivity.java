@@ -1,33 +1,26 @@
 package eu.appbucket.rothar.ui;
 
+import eu.appbucket.rothar.R;
+import eu.appbucket.rothar.R.id;
+import eu.appbucket.rothar.R.layout;
+import eu.appbucket.rothar.R.menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
-import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.ui.task.RegisterTask;
 
-public class RegistrationActivity extends Activity {
+public class AboutActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_register);
+		setContentView(R.layout.activity_about);
 	}
 
-	public void registerTagByCode(View view) {
-		String tagCode = ((EditText) findViewById(R.id.tag_code)).getText().toString();
-		Toast.makeText(this, "Registering tag code: " + tagCode, Toast.LENGTH_SHORT).show();
-		new RegisterTask(this).execute(tagCode);
-	}
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.register, menu);
+		getMenuInflater().inflate(R.menu.about, menu);
 		return true;
 	}
 

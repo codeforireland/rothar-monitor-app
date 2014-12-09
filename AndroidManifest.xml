@@ -39,20 +39,25 @@
         </receiver>
 
         <activity
-            android:name="eu.appbucket.rothar.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/title_activity_register" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="eu.appbucket.rothar.ui.TagActivity"
+            android:name=".ui.TagActivity"
             android:label="@string/title_activity_tag" >
-        </activity>        
+        </activity>
         <activity
-            android:name="eu.appbucket.rothar.ui.RegistrationActivity"
+            android:name=".ui.RegistrationActivity"
             android:label="@string/title_activity_register" >
+        </activity>
+        <activity
+            android:name="eu.appbucket.rothar.ui.AboutActivity"
+            android:label="@string/title_activity_about" >
         </activity>
     </application>
 

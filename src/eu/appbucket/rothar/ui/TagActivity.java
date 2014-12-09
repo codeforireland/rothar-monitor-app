@@ -2,6 +2,8 @@ package eu.appbucket.rothar.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ToggleButton;
 import eu.appbucket.rothar.R;
@@ -18,13 +20,39 @@ public class TagActivity extends Activity {
 		setContentView(R.layout.activity_tag);
 	}
 	
-	public void onStatusChanged(View view) {
+	/*public void onStatusChanged(View view) {
 		boolean isStolen = ((ToggleButton) view).isChecked();
 		if(isStolen) {
 			updateBikeMarkStolen();
 		} else {
 			updateBikeMarkRecovered();
 		}
+	}*/
+	
+
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.tag, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.mark_stolen) {
+			updateBikeMarkStolen();
+			return true;
+		} else if (id == R.id.mark_recovered) {
+			updateBikeMarkRecovered();
+			return true;
+		} else if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	private void updateBikeMarkStolen() {

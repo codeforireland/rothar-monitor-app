@@ -3,9 +3,27 @@
     tools:context="eu.appbucket.rothar.TagActivity" >
 
     <item
+        android:id="@+id/mark_stolen"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/mark_stolen"/>
+
+    <item
+        android:id="@+id/mark_recovered"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/mark_found"/>
+        
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
 
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_about"/>
+    
 </menu>

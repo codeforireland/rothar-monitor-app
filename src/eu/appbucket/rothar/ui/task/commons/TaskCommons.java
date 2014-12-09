@@ -32,10 +32,10 @@ public class TaskCommons {
 			} else if (responseCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
 				result.setResult(OPERATION_RESULT.FAILUR);
 				result.setMessage("Server error.");
-				InputStream is = response.getEntity().getContent();
+				/*InputStream is = response.getEntity().getContent();
 		        String assetAsJsonString = convertInputStreamToString(is, len);
 		        // parse json are set reponse 
-			} else {
+*/			} else {
 				result.setResult(OPERATION_RESULT.FAILUR);
 				result.setMessage("Unknown error.");
 			}

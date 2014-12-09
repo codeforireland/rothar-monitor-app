@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="eu.appbucket.monitor.MainActivity" >
+    tools:context="eu.appbucket.rothar.AboutActivity" >
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_about"/>
+        android:title="@string/action_about"/>>
 
 </menu>
