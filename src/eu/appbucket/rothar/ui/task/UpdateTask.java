@@ -32,7 +32,7 @@ public class UpdateTask extends AsyncTask<AssetData, Void, OperationResult> {
 		this.asset = asset;
 		String dataToSend = convertJsonToString(asset);
 		String url = Settings.SERVER_URL + "/v4/assets/" + asset.getAssetId();
-		return TaskCommons.postDataToUrl(dataToSend, url);
+		return TaskCommons.putDataToUrl(dataToSend, url);
 	}
 	
 	private String convertJsonToString(AssetData asset) throws TaskProcessingError {

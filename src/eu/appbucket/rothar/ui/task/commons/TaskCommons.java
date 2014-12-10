@@ -7,7 +7,9 @@ import java.io.Reader;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,11 +21,31 @@ import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
 public class TaskCommons {
 	
-	public static OperationResult postDataToUrl(String dataToSend, String url)  {
+	public enum RequestMethod {
+		  GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
+	}
+	
+	public static OperationResult putDataToUrl(String dataToSend, String url)  {
+		return sendDataToUrl(RequestMethod.PUT, dataToSend, url);
+	}
+	
+	public static OperationResult postDataToUrl(String dataToSend, String url)  {		
+		return sendDataToUrl(RequestMethod.POST, dataToSend, url);
+	}
+	
+	private static OperationResult sendDataToUrl(RequestMethod method, String dataToSend, String url) {
 		OperationResult result = new OperationResult();
 		result.setResult(OPERATION_RESULT.FAILUR);
-		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
-		HttpPost request = new HttpPost(url);
+		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");	
+		HttpEntityEnclosingRequestBase request;
+		if(method.equals(RequestMethod.POST)) {
+			request = new HttpPost(url);	
+		} else if (method.equals(RequestMethod.PUT)){
+			request = new HttpPut(url);
+		} else {
+			result.setMessage("Unknow method.");
+			return result;
+		}
 		request.setHeader("Content-Type", "application/json");
 		try {
 			StringEntity data = new StringEntity(dataToSend);
@@ -34,24 +56,25 @@ public class TaskCommons {
 			int responseCode = response.getStatusLine().getStatusCode();
 			if(responseCode == HttpStatus.SC_OK) {
 				result.setResult(OPERATION_RESULT.SUCCESS);	
-			} else if (responseCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-				// TODO: cleanup this mess
-				result.setResult(OPERATION_RESULT.FAILUR);
-				InputStream is = response.getEntity().getContent();
-		        String errorJsonString = convertInputStreamToString(is);
-		        ErrorInfo error = convertRowDataToError(errorJsonString);
+			} else if (responseCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {				
+		        ErrorInfo error = convertResponseToErrorInfo(response);
 		        result.setMessage("Server error: " + error.getClientMessage());
-		    } else {
-				result.setResult(OPERATION_RESULT.FAILUR);
+		    } else {				
 				result.setMessage("Unknown error.");
 			}
-		} catch (IOException e) {
-			result.setResult(OPERATION_RESULT.FAILUR);
+		} catch (IOException e) {			
 			result.setMessage("Communication error. ");
 		} finally {
 			client.close();
 		}
 		return result;
+	}
+	
+	private static ErrorInfo convertResponseToErrorInfo(HttpResponse response) throws IllegalStateException, IOException {
+		InputStream is = response.getEntity().getContent();
+        String errorJsonString = convertInputStreamToString(is);
+        ErrorInfo error = convertRowDataToError(errorJsonString);
+        return error;
 	}
 	
 	public static String convertInputStreamToString(InputStream stream) throws TaskProcessingError {
