@@ -1,13 +1,10 @@
 package eu.appbucket.rothar.ui;
 
-import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.R.id;
-import eu.appbucket.rothar.R.layout;
-import eu.appbucket.rothar.R.menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import eu.appbucket.rothar.R;
 
 public class AboutActivity extends Activity {
 
