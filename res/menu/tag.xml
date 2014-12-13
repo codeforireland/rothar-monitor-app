@@ -3,26 +3,40 @@
     tools:context="eu.appbucket.rothar.TagActivity" >
 
     <item
+        android:id="@+id/action_previous_day"
+        android:orderInCategory="10"
+       	android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_media_previous"
+        android:title="@string/action_previous_day"/>
+    		
+    <item
+        android:id="@+id/action_next_day"
+        android:orderInCategory="20"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_media_next"
+        android:title="@string/action_next_day"/>
+        
+    <item
         android:id="@+id/mark_stolen"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/mark_stolen"/>
 
     <item
         android:id="@+id/mark_recovered"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:showAsAction="never"
         android:title="@string/mark_found"/>
         
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="300"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
 
     <item
         android:id="@+id/action_about"
-        android:orderInCategory="100"
+        android:orderInCategory="400"
         android:showAsAction="never"
         android:title="@string/action_about"/>
     

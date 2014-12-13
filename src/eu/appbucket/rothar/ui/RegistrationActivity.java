@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.ui.task.RegisterTask;
+import eu.appbucket.rothar.ui.task.RegisterTagTask;
 
 public class RegistrationActivity extends Activity {
 
@@ -21,7 +21,7 @@ public class RegistrationActivity extends Activity {
 	public void registerTagByCode(View view) {
 		String tagCode = ((EditText) findViewById(R.id.tag_code)).getText().toString();
 		Toast.makeText(this, "Registering tag code: " + tagCode, Toast.LENGTH_SHORT).show();
-		new RegisterTask(this).execute(tagCode);
+		new RegisterTagTask(this).execute(tagCode);
 	}
 	
 	@Override

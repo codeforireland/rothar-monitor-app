@@ -14,12 +14,12 @@ import eu.appbucket.rothar.ui.task.commons.TaskCommons;
 import eu.appbucket.rothar.ui.task.commons.TaskProcessingError;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 
-public class UpdateTask extends AsyncTask<AssetData, Void, OperationResult> {
+public class UpdateTagTask extends AsyncTask<AssetData, Void, OperationResult> {
 
 	private Context context;
 	private AssetData asset;
 	
-	public UpdateTask(Context context) {
+	public UpdateTagTask(Context context) {
 		this.context = context;
 	}
 	

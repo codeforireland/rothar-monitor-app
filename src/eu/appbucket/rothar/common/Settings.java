@@ -1,5 +1,7 @@
 package eu.appbucket.rothar.common;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Settings {
 	
 	public final static String SERVER_URL = "http://api.dev.rothar.appbucket.eu"; // development machine
@@ -48,4 +50,6 @@ public class Settings {
 	
 	public final static String ASSET_ID_PREF_NAME = "asset-id";
 	public final static String ASSET_STATUS_PREF_NAME = "asset-status";
+	
+	public final static LatLng MAP_DEFAULT_LOCATION = new LatLng(53.21, -6.15);
 }

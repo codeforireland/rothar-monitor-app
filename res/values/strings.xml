@@ -26,4 +26,6 @@
     <string name="action_about">About</string>
     <string name="mark_stolen">Mark as stolen</string>
     <string name="mark_found">Mark as found</string>
+    <string name="action_previous_day">Previous day</string>
+    <string name="action_next_day">Next day</string>
 </resources>

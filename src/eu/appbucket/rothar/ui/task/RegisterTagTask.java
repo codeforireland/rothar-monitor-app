@@ -53,12 +53,12 @@ class OperationResult {
 	}
 }
 
-public class RegisterTask extends AsyncTask<String, Void, OperationResult> {
+public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 
 	private Context context;
 	private static final String LOG_TAG = "RegisterTask";
 
-	public RegisterTask(Context context) {
+	public RegisterTagTask(Context context) {
 		this.context = context;
 	}
 	
