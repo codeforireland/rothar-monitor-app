@@ -1,19 +1,20 @@
 package eu.appbucket.rothar.ui;
 
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.http.util.LangUtils;
+import java.util.Locale;
 
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
@@ -32,13 +33,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 	private List<ReportData> reports;
 	private GoogleMap map;
-	private int dayIndex;
+	private int dayIndex = 0;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        loadBicycleReportsForToday();
+        addMapToView();
     }
 
 	private void loadBicycleReportsForToday() {
@@ -47,7 +48,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	private Date getDateForToday() {
 		dayIndex = 0;
-		return null;
+		return getDateForDayIndex();
 	}
 	
 	private Date getDateForDayIndex() {
@@ -57,23 +58,45 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	}
 	
 	private Date getDateForNextDay() {
-		dayIndex++;
+		if(dayIndex < 0) {
+			dayIndex++;	
+		}
 		return getDateForDayIndex();
 	}
 	
 	private Date getDateForPreviousDay() {
-		dayIndex--;
+		dayIndex--;	
 		return getDateForDayIndex();
 	}
 	
 	public void loadBicycleReportsForDay(Date date) {
-		new UpdateMapTask(this).equals(date);
+		new UpdateMapTask(this).execute(date);
 	}
 	
 	public void onMapReportUpdate(List<ReportData> reports) {
 		this.reports = reports;
+		showReportInformation();
+		removerReportMarkersAndLineFromMap();
+		addReportMarkersAndLineToMap();
 		LatLng mapCenterLocation = findFirstReportOrDefaultLocation();
-		createMapAtLocation(mapCenterLocation);
+		moveToMapLocation(mapCenterLocation);
+	}
+	
+	private void showReportInformation() {
+		Date reportDate = getDateForDayIndex();
+		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
+		String message;
+		String formatterReportDate = formatter.format(reportDate);
+		if(reports.size() > 0) {
+			message = "Found " + reports.size() + " report(s) for: " + formatterReportDate;
+		} else {
+			message = "No reports found for: " + formatterReportDate;
+		}
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+	}
+	private void moveToMapLocation(LatLng mapLocation) {
+		CameraPosition cameraPosition = CameraPosition.builder().target(mapLocation).zoom(Settings.MAP.DEFAULT_ZOOM).build();
+		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 	
 	private LatLng findFirstReportOrDefaultLocation() {
@@ -81,25 +104,32 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 			ReportData firstReport = reports.get(0);
 			return new LatLng(firstReport.getLatitude(), firstReport.getLongitude());
 		} else {
-			return Settings.MAP_DEFAULT_LOCATION;
+			return Settings.MAP.DEFAULT_LOCATION;
 		}
 	}
-	
-    private void createMapAtLocation(LatLng mapLocation) {
+    
+    private void addMapToView() {
+    	GoogleMapOptions mapOptions = buildInitiallMapSettings();
+    	createMapFragmentForSettings(mapOptions);
+    }
+    
+    private GoogleMapOptions buildInitiallMapSettings() {
     	GoogleMapOptions options = new GoogleMapOptions();
-    	ReportData firstReport = reports.get(0);
-    	LatLng target = new LatLng(firstReport.getLatitude(), firstReport.getLongitude());
-    	float zoom = 17;
-    	CameraPosition camera = CameraPosition.fromLatLngZoom(target, zoom);
+    	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
     	options.camera(camera);
-		MapFragment mMapFragment = MapFragment.newInstance(options);
+    	return options;
+    }
+    
+    private void createMapFragmentForSettings(GoogleMapOptions options) {
+    	MapFragment mMapFragment = MapFragment.newInstance(options);
 		mMapFragment.getMapAsync(this);
 		FragmentTransaction fragmentTransaction =
 		         getFragmentManager().beginTransaction();
+		fragmentTransaction.remove(mMapFragment);
 		fragmentTransaction.add(R.id.map_fragment, mMapFragment);
 		fragmentTransaction.commit();
     }
-
+    
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.tag, menu);
@@ -109,21 +139,32 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	@Override
 	public void onMapReady(GoogleMap map) {
 		this.map = map;
-		addReportMarkersOnMap();
+		setMapSettings();
+		loadBicycleReportsForToday();
 	}
 	
-	private void addReportMarkersOnMap() {
+	private void setMapSettings() {
+		map.getUiSettings().setMapToolbarEnabled(false);
+	}
+	
+	private void removerReportMarkersAndLineFromMap() {
+		map.clear();
+	}
+
+	private void addReportMarkersAndLineToMap() {
 		PolylineOptions locationsLine = new PolylineOptions();
 		LatLng point;
+		SimpleDateFormat formatter = new SimpleDateFormat("kk:mm EEEE, d MMMM yyyy", Locale.getDefault());
 		for(ReportData report: reports) {
 			point = new LatLng(report.getLatitude(), report.getLongitude());
 			map.addMarker(new MarkerOptions()
 	        	.position(point)
-	        	.title(report.getCreated().toString()));
+	        	.title(formatter.format(report.getCreated())));
 			locationsLine.add(point);
 		}
 		map.addPolyline(locationsLine);
 	}
+	
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

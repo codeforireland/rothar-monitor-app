@@ -7,10 +7,20 @@ public class OperationResult {
 		SUCCESS,
 		FAILUR
 	}
-	
+			
 	private String message;
 	private OPERATION_RESULT result;
 	
+	private String payload;
+	
+	public void setPayload(String payload) {
+		this.payload = payload;
+	}
+    
+	public String getPayload() {
+    	return payload;
+    }
+    
 	public void setMessage(String message) {
 		this.message = message;
 	}

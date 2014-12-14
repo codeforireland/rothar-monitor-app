@@ -51,5 +51,9 @@ public class Settings {
 	public final static String ASSET_ID_PREF_NAME = "asset-id";
 	public final static String ASSET_STATUS_PREF_NAME = "asset-status";
 	
-	public final static LatLng MAP_DEFAULT_LOCATION = new LatLng(53.21, -6.15);
+	public final static class MAP {
+		public final static LatLng DEFAULT_LOCATION = new LatLng(53.21, -6.15);
+		public final static float DEFAULT_ZOOM = 17;
+	}
+	
 }

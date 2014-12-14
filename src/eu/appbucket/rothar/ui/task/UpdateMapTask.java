@@ -5,13 +5,15 @@ import java.util.Date;
 import java.util.List;
 
 import android.os.AsyncTask;
+import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.MapUpdateListener;
+import eu.appbucket.rothar.ui.task.commons.TaskCommons;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class UpdateMapTask extends AsyncTask<Date, Void, List<ReportData>> {
 
 	private MapUpdateListener listener;
-	
+	private final static String URL = Settings.SERVER_URL + "/v4/assets/" + asset.getAssetId();
 	public UpdateMapTask(MapUpdateListener listener) {
 		this.listener = listener;
 	}
@@ -22,9 +24,10 @@ public class UpdateMapTask extends AsyncTask<Date, Void, List<ReportData>> {
 	}
 	
 	private List<ReportData> readReportsInTheBackgroupd(Date reportDate) {
-		// - end -
 		List<ReportData> reports = new ArrayList<ReportData>();
-		ReportData report1 = new ReportData();
+		TaskCommons.getDataFromUrl(url);
+		
+		/*ReportData report1 = new ReportData();
 		report1.setLatitude(53.34 + (Math.random() / 100));
 		report1.setLongitude(-6.26 + (Math.random() / 100));
 		report1.setCreated(reportDate);
@@ -33,7 +36,7 @@ public class UpdateMapTask extends AsyncTask<Date, Void, List<ReportData>> {
 		report2.setLatitude(53.34 + (Math.random() / 100));
 		report2.setLongitude(-6.25 + (Math.random() / 100));
 		report2.setCreated(reportDate);
-		reports.add(report2);
+		reports.add(report2)*/;
 		return reports;
 	}
 	

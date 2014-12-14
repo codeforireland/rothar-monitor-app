@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -15,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.net.http.AndroidHttpClient;
+import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.task.commons.OperationResult.OPERATION_RESULT;
 import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
@@ -23,6 +27,37 @@ public class TaskCommons {
 	
 	public enum RequestMethod {
 		  GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
+	}
+	
+	public static OperationResult getDataFromUrl(String url)  {
+		return retrieveDataFromUrl(url);
+	}
+	
+	private static OperationResult retrieveDataFromUrl(String url) {
+		OperationResult result = new OperationResult();
+		result.setResult(OPERATION_RESULT.FAILUR);
+		AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+		HttpGet request = new HttpGet(url);
+		request.setHeader("Content-Type", "application/json");
+		try {
+			HttpResponse response = client.execute(request);
+			int responseCode = response.getStatusLine().getStatusCode();			
+			if(responseCode == HttpURLConnection.HTTP_OK) {
+				InputStream is = response.getEntity().getContent();
+				result.setPayload(convertInputStreamToString(is));
+				result.setResult(OPERATION_RESULT.SUCCESS);
+			} else if (responseCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {				
+		        ErrorInfo error = convertResponseToErrorInfo(response);
+		        result.setMessage("Server error: " + error.getClientMessage());
+		    } else {
+		    	result.setMessage("Unknown error.");
+			}
+		} catch (IOException e) {
+			result.setMessage("Communication error.");
+		} finally {
+			client.close();
+		}
+		return result;
 	}
 	
 	public static OperationResult putDataToUrl(String dataToSend, String url)  {
