@@ -13,7 +13,7 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 public class UpdateMapTask extends AsyncTask<Date, Void, List<ReportData>> {
 
 	private MapUpdateListener listener;
-	// private final static String URL = Settings.SERVER_URL + "/v4/assets/" + asset.getAssetId();
+	private final static String URL = Settings.SERVER_URL + "/v4/assets/" + asset.getAssetId();
 	public UpdateMapTask(MapUpdateListener listener) {
 		this.listener = listener;
 	}
