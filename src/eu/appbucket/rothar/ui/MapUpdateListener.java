@@ -6,5 +6,6 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public interface MapUpdateListener {
 	
-	void onMapReportUpdate(List<ReportData> reports);
+	void onMapReportUpdateSuccess(List<ReportData> reports);
+	void onMapReportUpdateFailure();
 }

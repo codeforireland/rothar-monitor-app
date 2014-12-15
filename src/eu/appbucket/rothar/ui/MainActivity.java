@@ -86,10 +86,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	}
 	
 	public void loadBicycleReportsForDay(Date date) {
-		new UpdateMapTask(this).execute(date);
+		new UpdateMapTask(this, this).execute(date);
 	}
 	
-	public void onMapReportUpdate(List<ReportData> reports) {
+	public void onMapReportUpdateSuccess(List<ReportData> reports) {
 		this.reports = reports;
 		showReportInformation();
 		removerReportMarkersAndLineFromMap();
@@ -108,8 +108,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 		} else {
 			message = "No reports found for: " + formatterReportDate;
 		}
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
+	
+	@Override
+	public void onMapReportUpdateFailure() {
+		showFailureInformation();	
+	}
+	
+	private void showFailureInformation() {
+		Date reportDate = getDateForDayIndex();
+		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
+		String formatterReportDate = formatter.format(reportDate);
+		String message = "Can't retrieve report for: " + formatterReportDate;
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+	
 	private void moveToMapLocation(LatLng mapLocation) {
 		CameraPosition cameraPosition = CameraPosition.builder().target(mapLocation).zoom(Settings.MAP.DEFAULT_ZOOM).build();
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));

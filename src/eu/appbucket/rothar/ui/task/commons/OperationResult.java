@@ -1,5 +1,7 @@
 package eu.appbucket.rothar.ui.task.commons;
 
+import android.test.suitebuilder.TestSuiteBuilder.FailedToCreateTests;
+
 
 public class OperationResult {
 	
@@ -35,5 +37,13 @@ public class OperationResult {
 	
 	public OPERATION_RESULT getResult() {
 		return result;
+	}
+	
+	public boolean isFailure() {
+		return result.equals(OPERATION_RESULT.FAILUR);
+	}
+	
+	public boolean isSuccess() {
+		return result.equals(OPERATION_RESULT.SUCCESS);
 	}
 }
