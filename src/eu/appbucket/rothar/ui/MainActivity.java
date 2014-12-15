@@ -39,9 +39,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        addMapToView();
+        if(isActivityFirstTimeCreated(savedInstanceState)) {
+        	addMapToView();	
+        } else {
+        	recycleMapFromPreviousActivityLifeCycle();
+        }
     }
 
+    private boolean isActivityFirstTimeCreated(Bundle savedInstanceState) {
+    	if(savedInstanceState == null) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    private void recycleMapFromPreviousActivityLifeCycle() {
+    	MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
+    	map = mMapFragment.getMap();
+    }
+    
 	private void loadBicycleReportsForToday() {
 		this.loadBicycleReportsForDay(getDateForToday());
 	}
@@ -109,19 +125,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	}
     
     private void addMapToView() {
-    	GoogleMapOptions mapOptions = buildInitiallMapSettings();
-    	createMapFragmentForSettings(mapOptions);
+    	GoogleMapOptions mapOptions = buildDefaultMapSettings();
+    	createMapFragmentWithSettings(mapOptions);
     }
     
-    private GoogleMapOptions buildInitiallMapSettings() {
+    private GoogleMapOptions buildDefaultMapSettings() {
     	GoogleMapOptions options = new GoogleMapOptions();
     	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
     	options.camera(camera);
     	return options;
     }
     
-    private void createMapFragmentForSettings(GoogleMapOptions options) {
+    private void createMapFragmentWithSettings(GoogleMapOptions options) {
     	MapFragment mMapFragment = MapFragment.newInstance(options);
+    	mMapFragment.setRetainInstance(true);
 		mMapFragment.getMapAsync(this);
 		FragmentTransaction fragmentTransaction =
 		         getFragmentManager().beginTransaction();
