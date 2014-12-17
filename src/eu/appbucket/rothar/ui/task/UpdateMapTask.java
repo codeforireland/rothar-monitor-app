@@ -1,6 +1,7 @@
 package eu.appbucket.rothar.ui.task;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -11,10 +12,9 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 import eu.appbucket.rothar.ui.MapUpdateListener;
+import eu.appbucket.rothar.ui.task.UpdateMapTask.InputParameter;
 import eu.appbucket.rothar.ui.task.commons.OperationResult;
 import eu.appbucket.rothar.ui.task.commons.TaskCommons;
 import eu.appbucket.rothar.web.domain.report.ReportData;
@@ -24,45 +24,95 @@ class Result {
 	protected boolean failure = true;
 }
 
-public class UpdateMapTask extends AsyncTask<Date, Void, Result> {
+public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 
+	public class InputParameter {
+		private Date reportDate;
+		private int assetId;
+		
+		public void setAssetId(int assetId) {
+			this.assetId = assetId;
+		}
+		
+		public int getAssetId() {
+			return assetId;
+		}
+		
+		public void setReportDate(Date reportDate) {
+			this.reportDate = reportDate;
+		}
+		
+		public Date getReportDate() {
+			return reportDate;
+		}
+	}
+	
 	private static final String LOG_TAG = "UpdateMapTask";
 	private MapUpdateListener listener;
 	private int assetId;
 	
 	public UpdateMapTask(Context context, MapUpdateListener listener) {
 		this.listener = listener;
-		assetId = 33;
 	}
 
 	@Override
-	protected Result doInBackground(Date... params) {
+	protected Result doInBackground(InputParameter... params) {
 		return readReportsInTheBackground(params[0]);
 	}
 	
-	private Result readReportsInTheBackground(Date reportDate) {
+	private Result readReportsInTheBackground(InputParameter inputParameter) {
 		Result overallResult = new Result();
 		overallResult.reports = new ArrayList<ReportData>();
-		List<ReportData> currentRequestReports = new ArrayList<ReportData>();
+		List<ReportData> lastReports = new ArrayList<ReportData>();
 		int offset = 0;
 		int limit = 20;
-		String urlPattern = Settings.SERVER_URL + "/v4/assets/%s/reports?sort=created&limit=%s&offset=%s";
-		String currentRequestUrl;
-		OperationResult lastRequestResult;
+		String baseUrl = buildUrlForDate(inputParameter);
 		do {
-			currentRequestUrl = String.format(urlPattern, assetId, limit, offset);
-			lastRequestResult = TaskCommons.getDataFromUrl(currentRequestUrl);
-			Log.i(LOG_TAG, currentRequestUrl);
-			if(lastRequestResult.isSuccess()) {
-				currentRequestReports =  convertJsonStringToListOfReports(lastRequestResult.getPayload());
-				overallResult.reports.addAll(currentRequestReports);
+			String currentUrl = buildUrlForLimitAndOffset(baseUrl, limit, offset);
+			OperationResult lastResult = TaskCommons.getDataFromUrl(currentUrl);
+			if(lastResult.isSuccess()) {
+				lastReports =  convertJsonStringToListOfReports(lastResult.getPayload());
+				overallResult.reports.addAll(lastReports);
 				overallResult.failure = false;
 				offset = offset + limit;
 			} else {
 				overallResult.failure = true;
 			}
-		} while (currentRequestReports.size() > 0 && !overallResult.failure);
+		} while (lastReports.size() > 0 && !overallResult.failure);
 		return overallResult;
+	}
+	
+	private String buildUrlForDate(InputParameter inputParameter) {
+		String urlPattern = Settings.SERVER_URL + "/v4/assets/%s/reports/%s/%s?sort=created&order=asc&limit=%s&offset=%s";
+		Long startTime = getTimeStampAtTheBeginningOfDay(inputParameter.getReportDate());
+		Long endTime = getTimeStampAtTheEndOfDay(inputParameter.getReportDate());
+		String url = String.format(urlPattern, urlPattern, startTime, endTime, inputParameter.getAssetId());
+		return url;
+	}
+	
+	private String buildUrlForLimitAndOffset(String baseUrl, int limit, int offset) {
+		String url = String.format(baseUrl, limit, offset);
+		return url;
+	}
+	
+	private long getTimeStampAtTheBeginningOfDay(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTimeInMillis();
+	}
+	
+	private long getTimeStampAtTheEndOfDay(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		return cal.getTimeInMillis();
 	}
 	
 	private List<ReportData> convertJsonStringToListOfReports(String jsonArrayAsString) {

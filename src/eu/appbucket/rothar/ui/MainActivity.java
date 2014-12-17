@@ -86,7 +86,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	}
 	
 	public void loadBicycleReportsForDay(Date date) {
-		new UpdateMapTask(this, this).execute(date);
+		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
+		inputParameter.setAssetId(assetId);
+		inputParameter.setReportDate(date);
+		new UpdateMapTask(this, this).execute(inputParameter);
 	}
 	
 	public void onMapReportUpdateSuccess(List<ReportData> reports) {
