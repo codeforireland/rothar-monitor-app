@@ -25,8 +25,8 @@ class Result {
 }
 
 public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
-
-	public class InputParameter {
+	
+	public static class InputParameter {
 		private Date reportDate;
 		private int assetId;
 		
@@ -83,15 +83,15 @@ public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 	}
 	
 	private String buildUrlForDate(InputParameter inputParameter) {
-		String urlPattern = Settings.SERVER_URL + "/v4/assets/%s/reports/%s/%s?sort=created&order=asc&limit=%s&offset=%s";
+		String urlPattern = Settings.SERVER_URL + "/v4/assets/%s/reports/%s/%s?sort=created&order=asc&";
 		Long startTime = getTimeStampAtTheBeginningOfDay(inputParameter.getReportDate());
 		Long endTime = getTimeStampAtTheEndOfDay(inputParameter.getReportDate());
-		String url = String.format(urlPattern, urlPattern, startTime, endTime, inputParameter.getAssetId());
+		String url = String.format(urlPattern, inputParameter.getAssetId(), startTime, endTime);
 		return url;
 	}
 	
 	private String buildUrlForLimitAndOffset(String baseUrl, int limit, int offset) {
-		String url = String.format(baseUrl, limit, offset);
+		String url = String.format(baseUrl + "limit=%s&offset=%s", limit, offset);
 		return url;
 	}
 	
