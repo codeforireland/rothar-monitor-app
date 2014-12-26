@@ -1,11 +1,12 @@
 package eu.appbucket.rothar.ui.task.commons;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -18,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.net.http.AndroidHttpClient;
-import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.task.commons.OperationResult.OPERATION_RESULT;
 import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
@@ -113,16 +113,20 @@ public class TaskCommons {
 	}
 	
 	public static String convertInputStreamToString(InputStream stream) throws TaskProcessingError {
-		int len = 1500;
+		BufferedReader reader;
+		StringBuilder sb = new StringBuilder();
+		String line = null;
 		try {
-	    	Reader reader = null;
-		    reader = new InputStreamReader(stream, "UTF-8");        
-		    char[] buffer = new char[len];
-		    reader.read(buffer);
-		    return new String(buffer);
+			reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+			while ((line = reader.readLine()) != null)
+			    sb.append(line);
+		} catch (UnsupportedEncodingException e) {
+			throw new TaskProcessingError("Can't convert input data to string (UnsupportedEncodingException).", e);
 		} catch (IOException e) {
-			throw new TaskProcessingError("Can't convert input data to string.", e);
-		}		
+			throw new TaskProcessingError("Can't convert input data to string (IOException).", e);
+		}
+        String result = sb.toString();
+        return result;
 	}
 	
 	private static ErrorInfo convertRowDataToError(String result) {

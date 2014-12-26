@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class Settings {
 	
-	public final static String SERVER_URL = "http://api.dev.rothar.appbucket.eu"; // development machine
+	public final static String SERVER_URL = "http://api.rothar.appbucket.eu";
 	// public final static String SERVER_URL = "http://10.0.2.2:8080/Rothar";
 	
 	public final class SYSTEM_IBEACON {

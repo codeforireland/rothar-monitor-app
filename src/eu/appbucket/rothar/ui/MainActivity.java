@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.task.UpdateMapTask;
 import eu.appbucket.rothar.web.domain.report.ReportData;
@@ -88,7 +87,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	public void loadBicycleReportsForDay(Date date) {
 		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
-		inputParameter.setAssetId(33);
+		inputParameter.setAssetId(37);
 		inputParameter.setReportDate(date);
 		new UpdateMapTask(this, this).execute(inputParameter);
 	}
@@ -143,8 +142,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 	}
     
     private void addMapToView() {
-    	GoogleMapOptions mapOptions = buildDefaultMapSettings();
-    	createMapFragmentWithSettings(mapOptions);
+    	GoogleMapOptions mapSettings = buildDefaultMapSettings();
+    	createMapFragmentWithSettings(mapSettings);
     }
     
     private GoogleMapOptions buildDefaultMapSettings() {
