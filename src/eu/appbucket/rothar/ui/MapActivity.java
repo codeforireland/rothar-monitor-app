@@ -27,12 +27,13 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, MapUpdateListener {
 
-	private GoogleMap map;
+	private MapManager mapManager;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mapManager = new MapManager(this, this);
         if(isActivityFirstTimeCreated(savedInstanceState)) {
         	addMapToView();	
         } else {
@@ -48,21 +49,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
     
     private void addMapToView() {
-    	GoogleMapOptions mapSettings = buildDefaultMapSettings();
+    	GoogleMapOptions mapSettings = mapManager.buildDefaultMapSettings();
     	createMapFragmentWithSettings(mapSettings);
     }
     
     private void recycleMapFromPreviousActivityLifeCycle() {
     	MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
-    	map = mMapFragment.getMap();
+    	mapManager.setMap(mMapFragment.getMap());
     }
 	
 	public void onMapReportUpdateSuccess(List<ReportData> reports) {
-		this.reports = reports;
-		new MapManager(this, this).showReportInformation();
-		new MapManager(this, this).removerReportMarkersAndLineFromMap();
-		new MapManager(this, this).addReportMarkersAndLineToMap();
-		new MapManager(this, this).moveToReportOrDefaultLocation();
+		mapManager.setReports(reports);
+		showReportInformation();
+		mapManager.removerReportMarkersAndLineFromMap();
+		mapManager.addReportMarkersAndLineToMap();
+		mapManager.moveToReportOrDefaultLocation();
 	}
 	
 	@Override
@@ -71,19 +72,26 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 	}
 	
 	private void showFailureInformation() {
-		Date reportDate = new MapManager(this, this).getDateForDayIndex();
+		Date reportDate = mapManager.getDateForDayIndex();
 		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
 		String formatterReportDate = formatter.format(reportDate);
 		String message = "Can't retrieve report for: " + formatterReportDate;
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
     
-    private GoogleMapOptions buildDefaultMapSettings() {
-    	GoogleMapOptions options = new GoogleMapOptions();
-    	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
-    	options.camera(camera);
-    	return options;
-    }
+	public void showReportInformation() {
+		Date reportDate = mapManager.getDateForDayIndex();
+		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
+		String message;
+		String formatterReportDate = formatter.format(reportDate);
+		if(mapManager.constainsReportsForCurrentDay()) {
+			message = "Found report(s) for: " + formatterReportDate;
+		} else {
+			message = "No reports found for: " + formatterReportDate;
+		}
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+
     
     private void createMapFragmentWithSettings(GoogleMapOptions options) {
     	MapFragment mMapFragment = MapFragment.newInstance(options);
@@ -104,23 +112,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 	
 	@Override
 	public void onMapReady(GoogleMap map) {
-		this.map = map;
-		setMapSettings();
-		new MapManager(this, this).loadBicycleReportsForToday();
-	}
-	
-	private void setMapSettings() {
-		map.getUiSettings().setMapToolbarEnabled(false);
+		mapManager.setMap(map);
+		mapManager.loadMapSettings();
+		mapManager.loadBicycleReportsForToday();
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_next_day) {
-			new MapManager(this, this).loadBicycleReportsForNextDay();
+			mapManager.loadBicycleReportsForNextDay();
 			return true;
 		} else if (id == R.id.action_previous_day) {
-			new MapManager(this, this).loadBicycleReportsForPreviousDay();
+			mapManager.loadBicycleReportsForPreviousDay();
 			return true;
 		} else if (id == R.id.action_settings) {
 			return true;

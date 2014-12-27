@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,8 +32,31 @@ public class MapManager {
 	
 	public MapManager(Context context, MapUpdateListener listener) {
 		this.context = context;
-	}	
+	}
 
+	public void setMap(GoogleMap map) {
+		this.map = map;
+	}
+	
+	public void setReports(List<ReportData> reports) {
+		this.reports = reports;
+	}
+	
+	public boolean constainsReportsForCurrentDay() {
+		return !reports.isEmpty();
+	}
+	
+    public GoogleMapOptions buildDefaultMapSettings() {
+    	GoogleMapOptions options = new GoogleMapOptions();
+    	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
+    	options.camera(camera);
+    	return options;
+    }
+    
+    public void loadMapSettings() {
+		map.getUiSettings().setMapToolbarEnabled(false);
+	}
+    
 	public void loadBicycleReportsForToday() {
 		this.loadBicycleReportsForDay(getDateForToday());
 	}
@@ -89,19 +113,6 @@ public class MapManager {
 	private void moveToMapLocation(LatLng mapLocation) {
 		CameraPosition cameraPosition = CameraPosition.builder().target(mapLocation).zoom(Settings.MAP.DEFAULT_ZOOM).build();
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-	}
-	
-	public void showReportInformation() {
-		Date reportDate = getDateForDayIndex();
-		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
-		String message;
-		String formatterReportDate = formatter.format(reportDate);
-		if(reports.size() > 0) {
-			message = "Found " + reports.size() + " report(s) for: " + formatterReportDate;
-		} else {
-			message = "No reports found for: " + formatterReportDate;
-		}
-		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 	}
 	
 	public Date getDateForToday() {
