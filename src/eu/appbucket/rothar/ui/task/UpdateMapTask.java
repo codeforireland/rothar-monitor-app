@@ -13,7 +13,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.MapUpdateListener;
+import eu.appbucket.rothar.ui.listener.MapUpdateListener;
 import eu.appbucket.rothar.ui.task.UpdateMapTask.InputParameter;
 import eu.appbucket.rothar.ui.task.commons.OperationResult;
 import eu.appbucket.rothar.ui.task.commons.TaskCommons;

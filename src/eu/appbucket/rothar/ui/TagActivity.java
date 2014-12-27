@@ -4,13 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ToggleButton;
 import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.common.ConfigurationManager;
-import eu.appbucket.rothar.ui.task.UpdateTagTask;
-import eu.appbucket.rothar.web.domain.asset.AssetData;
-import eu.appbucket.rothar.web.domain.asset.AssetStatus;
+import eu.appbucket.rothar.ui.manager.TagManager;
 
 public class TagActivity extends Activity {
 
@@ -28,33 +23,16 @@ public class TagActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.mark_stolen) {
-			updateBikeMarkStolen();
+			new TagManager(this).updateBikeMarkStolen();
 			return true;
 		} else if (id == R.id.mark_recovered) {
-			updateBikeMarkRecovered();
+			new TagManager(this).updateBikeMarkRecovered();
 			return true;
 		} else if (id == R.id.action_settings) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-	
-	private void updateBikeMarkStolen() {
-		AssetData asset = new AssetData();
-		asset.setAssetId(new ConfigurationManager(this).getAssetId());
-		asset.setStatus(AssetStatus.STOLEN);
-		new UpdateTagTask(this).execute(new AssetData[]{asset});
-	}
-	
-	private void updateBikeMarkRecovered() {
-		AssetData asset = new AssetData();
-		asset.setAssetId(new ConfigurationManager(this).getAssetId());
-		asset.setStatus(AssetStatus.RECOVERED);
-		new UpdateTagTask(this).execute(new AssetData[]{asset});
 	}
 }

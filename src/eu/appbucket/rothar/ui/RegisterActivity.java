@@ -10,7 +10,7 @@ import android.widget.Toast;
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.ui.task.RegisterTagTask;
 
-public class RegistrationActivity extends Activity {
+public class RegisterActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

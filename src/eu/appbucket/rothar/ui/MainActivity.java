@@ -1,227 +1,139 @@
 package eu.appbucket.rothar.ui;
 
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import android.app.FragmentTransaction;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-
 import eu.appbucket.rothar.R;
-import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.task.UpdateMapTask;
-import eu.appbucket.rothar.web.domain.report.ReportData;
+import eu.appbucket.rothar.common.ConfigurationManager;
+import eu.appbucket.rothar.monitor.scheduler.TaskManager;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, MapUpdateListener {
-
-	private List<ReportData> reports;
-	private GoogleMap map;
-	private int dayIndex = 0;
+public class MainActivity extends Activity {
 	
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if(isActivityFirstTimeCreated(savedInstanceState)) {
-        	addMapToView();	
-        } else {
-        	recycleMapFromPreviousActivityLifeCycle();
-        }
-    }
-
-    private boolean isActivityFirstTimeCreated(Bundle savedInstanceState) {
-    	if(savedInstanceState == null) {
-    		return true;
-    	}
-    	return false;
-    }
-    
-    private void recycleMapFromPreviousActivityLifeCycle() {
-    	MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
-    	map = mMapFragment.getMap();
-    }
-    
-	private void loadBicycleReportsForToday() {
-		this.loadBicycleReportsForDay(getDateForToday());
-	}
-	
-	private Date getDateForToday() {
-		dayIndex = 0;
-		return getDateForDayIndex();
-	}
-	
-	private Date getDateForDayIndex() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, dayIndex);
-		return cal.getTime();
-	}
-	
-	private Date getDateForNextDay() {
-		if(dayIndex < 0) {
-			dayIndex++;	
-		}
-		return getDateForDayIndex();
-	}
-	
-	private Date getDateForPreviousDay() {
-		dayIndex--;	
-		return getDateForDayIndex();
-	}
-	
-	public void loadBicycleReportsForDay(Date date) {
-		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
-		inputParameter.setAssetId(37);
-		inputParameter.setReportDate(date);
-		new UpdateMapTask(this, this).execute(inputParameter);
-	}
-	
-	public void onMapReportUpdateSuccess(List<ReportData> reports) {
-		this.reports = reports;
-		showReportInformation();
-		removerReportMarkersAndLineFromMap();
-		addReportMarkersAndLineToMap();
-		LatLng mapCenterLocation = findFirstReportOrDefaultLocation();
-		moveToMapLocation(mapCenterLocation);
-	}
-	
-	private void showReportInformation() {
-		Date reportDate = getDateForDayIndex();
-		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
-		String message;
-		String formatterReportDate = formatter.format(reportDate);
-		if(reports.size() > 0) {
-			message = "Found " + reports.size() + " report(s) for: " + formatterReportDate;
-		} else {
-			message = "No reports found for: " + formatterReportDate;
-		}
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
+	private static final String LOG_TAG = "MainActivity";
 	
 	@Override
-	public void onMapReportUpdateFailure() {
-		showFailureInformation();	
-	}
-	
-	private void showFailureInformation() {
-		Date reportDate = getDateForDayIndex();
-		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
-		String formatterReportDate = formatter.format(reportDate);
-		String message = "Can't retrieve report for: " + formatterReportDate;
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-	
-	private void moveToMapLocation(LatLng mapLocation) {
-		CameraPosition cameraPosition = CameraPosition.builder().target(mapLocation).zoom(Settings.MAP.DEFAULT_ZOOM).build();
-		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-	}
-	
-	private LatLng findFirstReportOrDefaultLocation() {
-		if(reports.size() > 0) {
-			ReportData firstReport = reports.get(0);
-			return new LatLng(firstReport.getLatitude(), firstReport.getLongitude());
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		if(!isBluetoothEnabled()) {
+			showEnableBluetoothDialog();	
+		} else if(!isNetworkingEnabled()) {
+			showEnableNetworkinDialog();
 		} else {
-			return Settings.MAP.DEFAULT_LOCATION;
+			// setupShowNotificationCheckbox();
+			runBackgroundTasks();
+			startAppriopriateActivity();
+		}	
+	}
+
+	private boolean isBluetoothEnabled() {
+		BluetoothManager bluetoothManager = (BluetoothManager) 
+				MainActivity.this.getSystemService(Context.BLUETOOTH_SERVICE);
+		BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
+		if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
+			return true;
+		}
+		return false;
+	}
+	
+	private void showEnableBluetoothDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setMessage(R.string.bluetooth_dialog_message).setTitle(R.string.bluetooth_dialog_title);
+	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	        	   MainActivity.this.finish();
+	           }
+	       });
+	    AlertDialog dialog = builder.create();
+	    dialog.show();
+	}	
+	
+	private boolean isNetworkingEnabled() {
+		ConnectivityManager connec = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo wifi = connec.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	    NetworkInfo mobile = connec.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);	
+	    if (wifi.isConnected() || mobile.isConnected()) {
+	    	return true;
+	    }
+	    return false;	    
+	}
+	
+	private void showEnableNetworkinDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setMessage(R.string.networking_dialog_message).setTitle(R.string.networking_dialog_title);
+	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	        	   MainActivity.this.finish();
+	           }
+	       });
+	    AlertDialog dialog = builder.create();
+	    dialog.show();
+	}
+	
+	/*private void setupShowNotificationCheckbox() {
+		CheckBox showNotifcationsCheckbox = (CheckBox) findViewById(R.id.show_notifications);
+		final ConfigurationManager configuration = new ConfigurationManager(this);
+		showNotifcationsCheckbox.setChecked(configuration.isNotificationEnabled());
+		showNotifcationsCheckbox.setOnClickListener(
+				new OnClickListener() {					
+					@Override
+					public void onClick(View v) {
+						if (((CheckBox) v).isChecked()) {
+							configuration.enableNotifications();
+						} else {
+							configuration.disableNotifications();
+						}
+					}
+			}
+		);
+	}*/
+	
+	private void runBackgroundTasks() {
+		new TaskManager(MainActivity.this).scheduleTasks();
+	}
+	
+	private void startAppriopriateActivity() {
+		if(new ConfigurationManager(this).getAssetId() == null) {
+			startRegistrationActivity();
+		} else {
+			startMapActivity();
 		}
 	}
-    
-    private void addMapToView() {
-    	GoogleMapOptions mapSettings = buildDefaultMapSettings();
-    	createMapFragmentWithSettings(mapSettings);
-    }
-    
-    private GoogleMapOptions buildDefaultMapSettings() {
-    	GoogleMapOptions options = new GoogleMapOptions();
-    	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
-    	options.camera(camera);
-    	return options;
-    }
-    
-    private void createMapFragmentWithSettings(GoogleMapOptions options) {
-    	MapFragment mMapFragment = MapFragment.newInstance(options);
-    	mMapFragment.setRetainInstance(true);
-		mMapFragment.getMapAsync(this);
-		FragmentTransaction fragmentTransaction =
-		         getFragmentManager().beginTransaction();
-		fragmentTransaction.remove(mMapFragment);
-		fragmentTransaction.add(R.id.map_fragment, mMapFragment);
-		fragmentTransaction.commit();
-    }
-    
+	private void startRegistrationActivity() {
+		Intent intent = new Intent(this, RegisterActivity.class);
+		this.startActivity(intent);
+	}
+	
+	private void startMapActivity() {
+		Intent intent = new Intent(this, MapActivity.class);
+		this.startActivity(intent);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.tag, menu);
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	@Override
-	public void onMapReady(GoogleMap map) {
-		this.map = map;
-		setMapSettings();
-		loadBicycleReportsForToday();
-	}
-	
-	private void setMapSettings() {
-		map.getUiSettings().setMapToolbarEnabled(false);
-	}
-	
-	private void removerReportMarkersAndLineFromMap() {
-		map.clear();
-	}
 
-	private void addReportMarkersAndLineToMap() {
-		PolylineOptions locationsLine = new PolylineOptions();
-		LatLng point;
-		SimpleDateFormat formatter = new SimpleDateFormat("kk:mm EEEE, d MMMM yyyy", Locale.getDefault());
-		for(ReportData report: reports) {
-			point = new LatLng(report.getLatitude(), report.getLongitude());
-			map.addMarker(new MarkerOptions()
-	        	.position(point)
-	        	.title(formatter.format(report.getCreated())));
-			locationsLine.add(point);
-		}
-		map.addPolyline(locationsLine);
-	}
-	
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_next_day) {
-			loadBicycleReportsForNextDay();
-			return true;
-		} else if (id == R.id.action_previous_day) {
-			loadBicycleReportsForPreviousDay();
-			return true;
-		} else if (id == R.id.action_settings) {
+		if (id == R.id.action_settings) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-	
-	private void loadBicycleReportsForNextDay() {
-		Date nextDay = getDateForNextDay();
-		loadBicycleReportsForDay(nextDay);
-	}
-	
-	private void loadBicycleReportsForPreviousDay() {
-		Date previousDay = getDateForPreviousDay();
-		loadBicycleReportsForDay(previousDay);
 	}
 }
