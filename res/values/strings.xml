@@ -22,6 +22,7 @@
     <string name="register_button">Activate tag</string>
     <string name="tag_code_hint">Tag code</string>
     <string name="title_activity_tag">Tag</string>
+    <string name="title_activity_map">Map</string>
     <string name="title_activity_about">About</string>
     <string name="action_about">About</string>
     <string name="mark_stolen">Mark as stolen</string>

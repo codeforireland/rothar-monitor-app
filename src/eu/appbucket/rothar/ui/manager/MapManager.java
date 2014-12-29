@@ -32,6 +32,7 @@ public class MapManager {
 	
 	public MapManager(Context context, MapUpdateListener listener) {
 		this.context = context;
+		this.listener = listener;
 	}
 
 	public void setMap(GoogleMap map) {
@@ -71,7 +72,7 @@ public class MapManager {
 		loadBicycleReportsForDay(previousDay);
 	}
 	
-	public void loadBicycleReportsForDay(Date date) {
+	private void loadBicycleReportsForDay(Date date) {
 		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
 		inputParameter.setAssetId(37);
 		inputParameter.setReportDate(date);

@@ -50,7 +50,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     
     private void addMapToView() {
     	GoogleMapOptions mapSettings = mapManager.buildDefaultMapSettings();
-    	createMapFragmentWithSettings(mapSettings);
+    	createMapFragmentWithDefaultSettings(mapSettings);
     }
     
     private void recycleMapFromPreviousActivityLifeCycle() {
@@ -93,7 +93,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 	}
 
     
-    private void createMapFragmentWithSettings(GoogleMapOptions options) {
+    private void createMapFragmentWithDefaultSettings(GoogleMapOptions options) {
     	MapFragment mMapFragment = MapFragment.newInstance(options);
     	mMapFragment.setRetainInstance(true);
 		mMapFragment.getMapAsync(this);
