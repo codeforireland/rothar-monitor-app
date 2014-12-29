@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
-import eu.appbucket.rothar.common.NotificationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.report.ReporterTask;
 import eu.appbucket.rothar.monitor.update.StolenBikeDao;
@@ -99,18 +98,12 @@ public class MonitorTask extends BroadcastReceiver {
 		Log.d(LOG_TAG, "Stopping scanner.");
 		bluetoothAdapter.stopLeScan(scanCallback);
 		if(foundBeacons.size() == 0) {
-			showToast("No stolen bikes found.");	
-		} else {
-			showToast("Found " + foundBeacons.size() + " stolen bike(s).");
-			ReporterTask reporter = new ReporterTask(context);
-			for(BikeBeacon beacon: foundBeacons) {
-				reporter.store(beacon);
-			}
-			reporter.report();
+			return;
 		}
-	}
-	
-	private void showToast(String message) {
-		new NotificationManager(context).showNotification(message);
+		ReporterTask reporter = new ReporterTask(context);
+		for(BikeBeacon beacon: foundBeacons) {
+			reporter.store(beacon);
+		}
+		reporter.report();		
 	}
 }

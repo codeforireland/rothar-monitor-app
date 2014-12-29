@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +22,6 @@ import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.appbucket.rothar.common.NotificationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 
@@ -58,11 +56,6 @@ public class UpdaterTask extends BroadcastReceiver {
 		@Override
 		protected String doInBackground(Void... params) {
 			return fetchReportedBikesInBackground();
-		}
-		
-		@Override
-		protected void onPostExecute(String notification) {
-			new NotificationManager(context).showNotification(notification);
 		}
 	}
 	

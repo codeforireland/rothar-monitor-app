@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.json.JSONException;
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import eu.appbucket.rothar.common.ConfigurationManager;
-import eu.appbucket.rothar.common.NotificationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 import eu.appbucket.rothar.monitor.monitor.LocationReader;
@@ -87,11 +85,6 @@ public class ReporterTask {
 		@Override
 		protected String doInBackground(ReportData... reports) {
 			return postStolenBikeReportInTheBackground(reports[0]);
-		}
-		
-		@Override
-		protected void onPostExecute(String message) {
-			new NotificationManager(context).showNotification(message);
 		}
 	}
 	

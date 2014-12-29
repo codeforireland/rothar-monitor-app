@@ -23,6 +23,7 @@ import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.listener.MapUpdateListener;
 import eu.appbucket.rothar.ui.manager.MapManager;
+import eu.appbucket.rothar.ui.manager.TagManager;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, MapUpdateListener {
@@ -106,7 +107,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.tag, menu);
+		getMenuInflater().inflate(R.menu.map, menu);
 		return true;
 	}
 	
@@ -126,7 +127,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 		} else if (id == R.id.action_previous_day) {
 			mapManager.loadBicycleReportsForPreviousDay();
 			return true;
-		} else if (id == R.id.action_settings) {
+		} else if (id == R.id.mark_stolen) {
+			new TagManager(this).updateBikeMarkStolen();
+			return true;
+		} else if (id == R.id.mark_recovered) {
+			new TagManager(this).updateBikeMarkRecovered();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
