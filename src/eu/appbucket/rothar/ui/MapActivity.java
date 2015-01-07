@@ -29,12 +29,14 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, MapUpdateListener {
 
 	private MapManager mapManager;
+	private TagManager tagManager;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mapManager = new MapManager(this, this);
+        tagManager = new TagManager(this);
         if(isActivityFirstTimeCreated(savedInstanceState)) {
         	addMapToView();	
         } else {
@@ -128,10 +130,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 			mapManager.loadBicycleReportsForPreviousDay();
 			return true;
 		} else if (id == R.id.mark_stolen) {
-			new TagManager(this).updateBikeMarkStolen();
+			tagManager.updateBikeMarkStolen();
 			return true;
 		} else if (id == R.id.mark_recovered) {
-			new TagManager(this).updateBikeMarkRecovered();
+			tagManager.updateBikeMarkRecovered();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

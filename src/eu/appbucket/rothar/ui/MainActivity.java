@@ -9,32 +9,40 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.monitor.scheduler.TaskManager;
 
 public class MainActivity extends Activity {
 	
-	private static final String LOG_TAG = "MainActivity";
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		if(!isBluetoothEnabled()) {
+		boolean isBluetootLeCapable = isBluetootLeCapable();
+		if(isBluetootLeCapable && isBluetoothDisabled()) {
 			showEnableBluetoothDialog();	
-		} else if(!isNetworkingEnabled()) {
+		} else if(isNetworkingDisable()) {
 			showEnableNetworkinDialog();
 		} else {
-			// setupShowNotificationCheckbox();
-			runBackgroundTasks();
+			if(isBluetootLeCapable) {
+				runBackgroundTasks();	
+			}
 			startAppriopriateActivity();
 		}	
 	}
 
+	private boolean isBluetootLeCapable() {
+		return new ConfigurationManager(this).isBluetoothLeCapable();
+	}
+	
+	private boolean isBluetoothDisabled() {
+		return !this.isBluetoothEnabled();
+	}
+	
 	private boolean isBluetoothEnabled() {
 		BluetoothManager bluetoothManager = (BluetoothManager) 
 				MainActivity.this.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -56,6 +64,10 @@ public class MainActivity extends Activity {
 	    AlertDialog dialog = builder.create();
 	    dialog.show();
 	}	
+	
+	private boolean isNetworkingDisable() {
+		return !this.isNetworkingEnabled();
+	}
 	
 	private boolean isNetworkingEnabled() {
 		ConnectivityManager connec = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);

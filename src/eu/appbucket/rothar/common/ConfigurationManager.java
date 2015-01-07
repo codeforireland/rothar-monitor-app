@@ -6,6 +6,7 @@ import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 
 public class ConfigurationManager {
 	
@@ -101,5 +102,15 @@ public class ConfigurationManager {
 	public void setAssetStatus(AssetStatus status) {
 		int statusId = status.getStatusId();
 		saveInteger(Settings.ASSET_STATUS_PREF_NAME, statusId);
+	}
+	
+	public boolean isBluetoothLeCapable() {
+		if(Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT && Build.VERSION.RELEASE.equalsIgnoreCase("4.4.4")) {
+			return true;
+		}
+		if(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+			return true;
+		}
+		return false;
 	}
 }

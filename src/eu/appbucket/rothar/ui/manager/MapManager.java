@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
@@ -14,13 +16,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.listener.MapUpdateListener;
 import eu.appbucket.rothar.ui.task.UpdateMapTask;
 import eu.appbucket.rothar.web.domain.report.ReportData;
-
-import android.content.Context;
-import android.widget.Toast;
 
 public class MapManager {
 	
@@ -74,7 +74,7 @@ public class MapManager {
 	
 	private void loadBicycleReportsForDay(Date date) {
 		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
-		inputParameter.setAssetId(37);
+		inputParameter.setAssetId((new ConfigurationManager(context)).getAssetId());
 		inputParameter.setReportDate(date);
 		new UpdateMapTask(context, listener).execute(inputParameter);
 	}

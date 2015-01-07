@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.common.Settings.START_TASK;
 import eu.appbucket.rothar.common.Settings.STOP_TASK;
@@ -36,16 +37,19 @@ public class TaskManager extends BroadcastReceiver {
 		updaterTask = PendingIntent.getBroadcast(context, 0, updaterIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		// monitor
 		startTimes.add(new HourMinute(8, 30));
-		stopTimes.add(new HourMinute(23, 50));
-		/*stopTimes.add(new HourMinute(9, 30));
+		stopTimes.add(new HourMinute(9, 30));
 		startTimes.add(new HourMinute(17, 00));
-		stopTimes.add(new HourMinute(18, 00));*/
+		stopTimes.add(new HourMinute(18, 00));
 	}
 	
 	// Used only for intercepting device boot up
 	@Override
-	public void onReceive(Context context, Intent intent) {	
-		if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+	public void onReceive(Context context, Intent intent) {
+		boolean isBluetoothLeCapable = 
+				new ConfigurationManager(context).isBluetoothLeCapable();
+		boolean receivedBootCompletedEvent = 
+				intent.getAction().equals("android.intent.action.BOOT_COMPLETED");
+		if (receivedBootCompletedEvent && isBluetoothLeCapable) {
 			new TaskManager(context).scheduleTasks();
         }
 	}
