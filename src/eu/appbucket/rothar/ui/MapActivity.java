@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -17,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.CameraPosition;
 
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.Settings;
@@ -135,7 +136,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 		} else if (id == R.id.mark_recovered) {
 			tagManager.updateBikeMarkRecovered();
 			return true;
+		} else if (id == R.id.mark_recovered) {
+			tagManager.updateBikeMarkRecovered();
+			return true;
+		} else if (id == R.id.donate) {
+			openDonationPage();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void openDonationPage() {
+		Uri uri = Uri.parse(Settings.DONATION_URL);
+		startActivity(new Intent(Intent.ACTION_VIEW, uri));
 	}
 }

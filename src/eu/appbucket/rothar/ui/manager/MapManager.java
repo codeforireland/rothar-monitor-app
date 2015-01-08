@@ -56,6 +56,7 @@ public class MapManager {
     
     public void loadMapSettings() {
 		map.getUiSettings().setMapToolbarEnabled(false);
+		map.getUiSettings().setRotateGesturesEnabled(false);
 	}
     
 	public void loadBicycleReportsForToday() {
@@ -98,8 +99,13 @@ public class MapManager {
 	}
 	
 	public void moveToReportOrDefaultLocation() {
-		LatLng mapCenterLocation = findFirstReportOrDefaultLocation();
-		moveToMapLocation(mapCenterLocation);
+		LatLng mapFirstReportLocation = findFirstReportOrDefaultLocation();
+		LatLng mapDefaultLocation = findDefaultLocation();
+		if(mapFirstReportLocation != null) {
+			moveMapToLocationAndZoom(mapFirstReportLocation, Settings.MAP.LOCATION_ZOOM);	
+		} else {
+			moveMapToLocationAndZoom(mapDefaultLocation, Settings.MAP.DEFAULT_ZOOM);
+		}
 	}
 	
 	private LatLng findFirstReportOrDefaultLocation() {
@@ -107,12 +113,18 @@ public class MapManager {
 			ReportData firstReport = reports.get(0);
 			return new LatLng(firstReport.getLatitude(), firstReport.getLongitude());
 		} else {
-			return Settings.MAP.DEFAULT_LOCATION;
+			return null;
 		}
 	}
 	
-	private void moveToMapLocation(LatLng mapLocation) {
-		CameraPosition cameraPosition = CameraPosition.builder().target(mapLocation).zoom(Settings.MAP.DEFAULT_ZOOM).build();
+	private LatLng findDefaultLocation() {
+		return Settings.MAP.DEFAULT_LOCATION;
+	}
+	
+	private void moveMapToLocationAndZoom(LatLng mapLocation, float zoom) {
+		CameraPosition cameraPosition = CameraPosition.builder()
+				.target(mapLocation)
+				.zoom(zoom).build();
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 	

@@ -113,7 +113,7 @@ public class ReporterTask {
 			jsonObj.put("assetId", report.getAssetId());
 			jsonObj.put("latitude", report.getLatitude());
 			jsonObj.put("longitude", report.getLongitude());
-			jsonObj.put("reporter_uuid", report.getReporterUuid());
+			jsonObj.put("reporterUuid", report.getReporterUuid());
 		} catch (JSONException e) {
 			new ReporterTaskProcessingError("Can't convert report data to json object.", e);
 		}
