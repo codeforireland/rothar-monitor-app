@@ -63,10 +63,10 @@ public class MapActivity extends Activity implements OnMapReadyCallback, MapUpda
     
 	public void onMapReportUpdateSuccess(List<ReportData> reports) {
 		mapManager.setReports(reports);
-		showReportInformation();
 		mapManager.removerReportMarkersAndLineFromMap();
 		mapManager.addReportMarkersAndLineToMap();
 		mapManager.moveToReportOrDefaultLocation();
+		showReportInformation();
 		enableUserInteraction();
 	}
 	
