@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,18 +46,6 @@ public class MapManager {
 	
 	public boolean constainsReportsForCurrentDay() {
 		return !reports.isEmpty();
-	}
-	
-    public GoogleMapOptions buildDefaultMapSettings() {
-    	GoogleMapOptions options = new GoogleMapOptions();
-    	CameraPosition camera = CameraPosition.fromLatLngZoom(Settings.MAP.DEFAULT_LOCATION, Settings.MAP.DEFAULT_ZOOM);
-    	options.camera(camera);
-    	return options;
-    }
-    
-    public void loadMapSettings() {
-		map.getUiSettings().setMapToolbarEnabled(false);
-		map.getUiSettings().setRotateGesturesEnabled(false);
 	}
     
 	public void loadBicycleReportsForToday() {
@@ -100,11 +89,8 @@ public class MapManager {
 	
 	public void moveToReportOrDefaultLocation() {
 		LatLng mapFirstReportLocation = findFirstReportOrDefaultLocation();
-		LatLng mapDefaultLocation = findDefaultLocation();
 		if(mapFirstReportLocation != null) {
 			moveMapToLocationAndZoom(mapFirstReportLocation, Settings.MAP.LOCATION_ZOOM);	
-		} else {
-			moveMapToLocationAndZoom(mapDefaultLocation, Settings.MAP.DEFAULT_ZOOM);
 		}
 	}
 	
@@ -115,10 +101,6 @@ public class MapManager {
 		} else {
 			return null;
 		}
-	}
-	
-	private LatLng findDefaultLocation() {
-		return Settings.MAP.DEFAULT_LOCATION;
 	}
 	
 	private void moveMapToLocationAndZoom(LatLng mapLocation, float zoom) {

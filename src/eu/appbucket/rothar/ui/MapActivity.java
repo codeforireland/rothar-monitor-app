@@ -6,17 +6,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.FragmentTransaction;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
@@ -27,52 +26,54 @@ import eu.appbucket.rothar.ui.manager.MapManager;
 import eu.appbucket.rothar.ui.manager.TagManager;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback, MapUpdateListener {
+public class MapActivity extends Activity implements OnMapReadyCallback, MapUpdateListener {
 
 	private MapManager mapManager;
 	private TagManager tagManager;
+	private ProgressDialog progress;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mapManager = new MapManager(this, this);
+    	super.onCreate(savedInstanceState);
+    	setContentView(R.layout.activity_map);
+    	prepareProgressDialog();
+    	mapManager = new MapManager(this, this);
         tagManager = new TagManager(this);
-        if(isActivityFirstTimeCreated(savedInstanceState)) {
-        	addMapToView();	
-        } else {
-        	recycleMapFromPreviousActivityLifeCycle();
-        }
-    }
-
-    private boolean isActivityFirstTimeCreated(Bundle savedInstanceState) {
-    	if(savedInstanceState == null) {
-    		return true;
-    	}
-    	return false;
+        linkActivityAsMapListener();
     }
     
-    private void addMapToView() {
-    	GoogleMapOptions mapSettings = mapManager.buildDefaultMapSettings();
-    	createMapFragmentWithDefaultSettings(mapSettings);
+    private void prepareProgressDialog() {
+    	progress = new ProgressDialog(this);
+    	progress.setIndeterminate(true);
+		progress.setMessage("Searching reports ...");
+		progress.setCancelable(false);
     }
     
-    private void recycleMapFromPreviousActivityLifeCycle() {
-    	MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
-    	mapManager.setMap(mMapFragment.getMap());
+    private void linkActivityAsMapListener() {
+    	MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+    	mapFragment.getMapAsync(MapActivity.this);
     }
-	
+    
+    @Override
+	public void onMapReady(GoogleMap map) {
+    	disableUserInteraction();
+    	mapManager.setMap(map);
+		mapManager.loadBicycleReportsForToday();
+	}
+    
 	public void onMapReportUpdateSuccess(List<ReportData> reports) {
 		mapManager.setReports(reports);
 		showReportInformation();
 		mapManager.removerReportMarkersAndLineFromMap();
 		mapManager.addReportMarkersAndLineToMap();
 		mapManager.moveToReportOrDefaultLocation();
+		enableUserInteraction();
 	}
 	
 	@Override
 	public void onMapReportUpdateFailure() {
-		showFailureInformation();	
+		showFailureInformation();
+		enableUserInteraction();
 	}
 	
 	private void showFailureInformation() {
@@ -95,18 +96,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 		}
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
-
-    
-    private void createMapFragmentWithDefaultSettings(GoogleMapOptions options) {
-    	MapFragment mMapFragment = MapFragment.newInstance(options);
-    	mMapFragment.setRetainInstance(true);
-		mMapFragment.getMapAsync(this);
-		FragmentTransaction fragmentTransaction =
-		         getFragmentManager().beginTransaction();
-		fragmentTransaction.remove(mMapFragment);
-		fragmentTransaction.add(R.id.map_fragment, mMapFragment);
-		fragmentTransaction.commit();
-    }
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,19 +104,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 	}
 	
 	@Override
-	public void onMapReady(GoogleMap map) {
-		mapManager.setMap(map);
-		mapManager.loadMapSettings();
-		mapManager.loadBicycleReportsForToday();
-	}
-	
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_next_day) {
+			disableUserInteraction();
 			mapManager.loadBicycleReportsForNextDay();
 			return true;
 		} else if (id == R.id.action_previous_day) {
+			disableUserInteraction();
 			mapManager.loadBicycleReportsForPreviousDay();
 			return true;
 		} else if (id == R.id.mark_stolen) {
@@ -144,6 +128,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void disableUserInteraction() {
+		progress.show();
+	}
+	
+	private void enableUserInteraction() {
+		progress.dismiss();
 	}
 	
 	private void openDonationPage() {
