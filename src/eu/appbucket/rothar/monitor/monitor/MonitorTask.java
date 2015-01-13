@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.report.ReporterTask;
 import eu.appbucket.rothar.monitor.update.StolenBikeDao;
@@ -33,6 +34,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void scanForStolenBikes() {
+		LocalFileLogger.d(LOG_TAG, "Run monitor task.");
 		setupScanner();
 		startScanner();
 	}

@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
+import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 
@@ -46,7 +47,8 @@ public class UpdaterTask extends BroadcastReceiver {
 	} 
 	
 	@Override
-	public void onReceive(Context context, Intent intent) {		
+	public void onReceive(Context context, Intent intent) {
+		LocalFileLogger.d(LOG_TAG, "Starting updater.");
 		this.context = context;		
 		new ReportedBikesFetcher().execute();
 	}

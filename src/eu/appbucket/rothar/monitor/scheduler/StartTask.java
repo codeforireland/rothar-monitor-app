@@ -1,5 +1,6 @@
 package eu.appbucket.rothar.monitor.scheduler;
 
+import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 import android.app.AlarmManager;
@@ -20,7 +21,8 @@ public class StartTask extends BroadcastReceiver {
 	}
 	
 	private void startMonitorTask(Context context) {
-		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);		
+		LocalFileLogger.d(LOG_TAG, "Schedule monitor task.");
+		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);	
 		PendingIntent monitorTask = new TaskManager(context).buildOperationForClass(MonitorTask.class);		
 		alarmMgr.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP,

@@ -1,5 +1,6 @@
 package eu.appbucket.rothar.monitor.scheduler;
 
+import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -19,6 +20,7 @@ public class StopTask extends BroadcastReceiver {
 	}
 	
 	private void stopMonitorTask(Context context) {
+		LocalFileLogger.d(LOG_TAG, "Stop monitor task.");
 		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		PendingIntent monitorTask = new TaskManager(context).buildOperationForClass(MonitorTask.class);
 	    alarmMgr.cancel(monitorTask);
