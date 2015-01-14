@@ -26,24 +26,22 @@ public class LocalFileLogger {
 	}
 	
 	private static void log(String level, String tag, String message) {
-		synchronized (logFile) {
-			BufferedWriter logFileWriter = null;
+		BufferedWriter logFileWriter = null;
+		try {
+			logFileWriter = new BufferedWriter(new FileWriter(logFile, true));
+			logFileWriter.append(buildLogMessage(level, tag, message));
+			logFileWriter.newLine();
+			logFileWriter.flush();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "Can't write to file: " + e.getMessage());
+		} finally {
 			try {
-				logFileWriter = new BufferedWriter(new FileWriter(logFile, true));
-				logFileWriter.append(buildLogMessage(level, tag, message));
-				logFileWriter.newLine();
-				logFileWriter.flush();
-			} catch (IOException e) {
-				Log.e(LOG_TAG, "Can't write to file: " + e.getMessage());
-			} finally {
-				try {
-					if(logFileWriter != null) {
-						logFileWriter.close();	
-					}
-				} catch (IOException e) {
-					Log.e(LOG_TAG, "Can't close to file: " + e.getMessage());
+				if(logFileWriter != null) {
+					logFileWriter.close();	
 				}
-			}	
+			} catch (IOException e) {
+				Log.e(LOG_TAG, "Can't close to file: " + e.getMessage());
+			}
 		}
 	}
 	
@@ -61,7 +59,7 @@ public class LocalFileLogger {
 	}
 	
 	private static String buildFileTimeStamp() {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.format(new Date());
 	}
 }
