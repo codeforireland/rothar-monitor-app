@@ -64,8 +64,10 @@ public class UpdaterTask extends BroadcastReceiver {
 	}
 	
 	private String fetchReportedBikesInBackground() {
+		LocalFileLogger.d(LOG_TAG, "Run updater task.");
 		if(!isNetworkAvailable()) {
 			Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
+			LocalFileLogger.e(LOG_TAG, "Network not available.");
 			return "Can't fetch registered bikes - network disabled.";
 		}
 		try {
@@ -76,9 +78,11 @@ public class UpdaterTask extends BroadcastReceiver {
 	        return "Registered " + reportedBikes.size() + " stolen bikes.";
 		} catch (UpdaterTaskCommunicationError e) {
 			Log.e(LOG_TAG, "Communication error: ", e);
+			LocalFileLogger.e(LOG_TAG, "Communication error: "+ e.getMessage());
 			return "Can't fetch reported bikes - communication problem.";
 		} catch (UpdaterTaskProcessingError e) {
 			Log.e(LOG_TAG, "Processing error: ", e);
+			LocalFileLogger.e(LOG_TAG, "Processing error: "+ e.getMessage());
 			return "Can't fetch reported bikes - data problem.";
 		}
 	}

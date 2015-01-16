@@ -12,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -75,27 +76,31 @@ public class MapManager {
 		PolylineOptions locationsLine = new PolylineOptions();
 		LatLng point;
 		SimpleDateFormat formatter = new SimpleDateFormat("kk:mm EEEE, d MMMM yyyy", Locale.getDefault());
+		Marker lastReportMarker = null;
 		for(ReportData report: reports) {
 			point = new LatLng(report.getLatitude(), report.getLongitude());
-			map.addMarker(new MarkerOptions()
+			lastReportMarker = map.addMarker(new MarkerOptions()
 	        	.position(point)
 	        	.title(formatter.format(report.getCreated())));
 			locationsLine.add(point);
 		}
 		map.addPolyline(locationsLine);
-	}
-	
-	public void moveToReportOrDefaultLocation() {
-		LatLng mapFirstReportLocation = findFirstReportOrDefaultLocation();
-		if(mapFirstReportLocation != null) {
-			moveMapToLocationAndZoom(mapFirstReportLocation, Settings.MAP.LOCATION_ZOOM);	
+		if(lastReportMarker != null) {
+			lastReportMarker.showInfoWindow();
 		}
 	}
 	
-	private LatLng findFirstReportOrDefaultLocation() {
+	public void moveToReportOrDefaultLocation() {
+		LatLng lastReportLocation = findLastReportOrDefaultLocation();
+		if(lastReportLocation != null) {
+			moveMapToLocationAndZoom(lastReportLocation, Settings.MAP.LOCATION_ZOOM);	
+		}
+	}
+	
+	private LatLng findLastReportOrDefaultLocation() {
 		if(reports.size() > 0) {
-			ReportData firstReport = reports.get(0);
-			return new LatLng(firstReport.getLatitude(), firstReport.getLongitude());
+			ReportData lastReport = reports.get(reports.size() - 1);
+			return new LatLng(lastReport.getLatitude(), lastReport.getLongitude());
 		} else {
 			return null;
 		}
