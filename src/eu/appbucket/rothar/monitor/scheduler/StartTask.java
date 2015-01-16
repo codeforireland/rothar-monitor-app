@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
-import android.util.Log;
 import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.MonitorTask;
@@ -17,7 +16,7 @@ public class StartTask extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d(LOG_TAG, "Starting monitor task.");
+		//Log.d(LOG_TAG, "Starting monitor task.");
 		startMonitorTask(context);			
 	}
 	

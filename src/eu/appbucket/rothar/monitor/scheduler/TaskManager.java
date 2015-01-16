@@ -16,6 +16,7 @@ import eu.appbucket.rothar.common.Settings.STOP_TASK;
 import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 import eu.appbucket.rothar.monitor.update.UpdaterTask;
 
+@SuppressWarnings("rawtypes")
 public class TaskManager extends BroadcastReceiver {
 
 	private Context context;

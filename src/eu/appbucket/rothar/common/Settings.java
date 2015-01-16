@@ -1,7 +1,6 @@
 package eu.appbucket.rothar.common;
 
-import com.google.android.gms.maps.model.LatLng;
-
+@SuppressWarnings("unused")
 public class Settings {
 	
 	public final static String SERVER_URL = "http://api.rothar.appbucket.eu";

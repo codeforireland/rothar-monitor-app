@@ -63,6 +63,7 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 	}
 	
 	private class RegisterTaskCommunicationError extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		public RegisterTaskCommunicationError(String errorMessage) {
 			super(errorMessage);
 		}
@@ -72,15 +73,15 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 	} 
 	
 	private class RegisterTaskProcessingError extends RuntimeException {
-		public RegisterTaskProcessingError(String errorMessage) {
-			super(errorMessage);
-		}
+		private static final long serialVersionUID = 1L;
 		public RegisterTaskProcessingError(String errorMessage, Throwable throwable) {
 			super(errorMessage, throwable);
 		}
 	}
 	
 	private class RegisterTaskServerError extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
 		public RegisterTaskServerError(String serverResponse) {
 			super(serverResponse);
 		}

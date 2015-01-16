@@ -1,13 +1,12 @@
 package eu.appbucket.rothar.monitor.scheduler;
 
-import eu.appbucket.rothar.common.LocalFileLogger;
-import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import eu.appbucket.rothar.common.LocalFileLogger;
+import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 
 public class StopTask extends BroadcastReceiver {
 
@@ -15,7 +14,7 @@ public class StopTask extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d(LOG_TAG, "Stopping monitor task.");
+		//Log.d(LOG_TAG, "Stopping monitor task.");
 		stopMonitorTask(context);
 	}
 	

@@ -1,6 +1,5 @@
 package eu.appbucket.rothar.ui.task.commons;
 
-import android.test.suitebuilder.TestSuiteBuilder.FailedToCreateTests;
 
 
 public class OperationResult {

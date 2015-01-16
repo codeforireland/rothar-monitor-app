@@ -23,7 +23,6 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class ReporterTask {
 
-	private Context context;
 	private static final String LOG_TAG = "ReporterTask";
 	private final Set<BikeBeacon> foundBeacons = new HashSet<BikeBeacon>();
 	private LocationReader locationUpdater;
@@ -31,31 +30,32 @@ public class ReporterTask {
 	private String applicationUuid;
 	
 	private class ReporterTaskProcessingError extends RuntimeException {		
+		private static final long serialVersionUID = 1L;
 		public ReporterTaskProcessingError(String errorMessage, Throwable throwable) {
 			super(errorMessage, throwable);
 		}
 	} 
 	
-	private class ReporterTaskCommunicationError extends RuntimeException {		
+	private class ReporterTaskCommunicationError extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		public ReporterTaskCommunicationError(String errorMessage, Throwable throwable) {
 			super(errorMessage, throwable);
 		}
 	} 
 	
 	public ReporterTask(Context context) {
-		this.context = context;
 		locationUpdater = new LocationReader(context);
 		locationUpdater.start();
 		applicationUuid = new ConfigurationManager(context).getApplicationUuid();
 	}
 	
 	public void store(BikeBeacon foundBacon) {
-		Log.d(LOG_TAG, "Adding beacon: " + foundBacon.getMinor() + " to report " + Thread.currentThread().getId());
+		//Log.d(LOG_TAG, "Adding beacon: " + foundBacon.getMinor() + " to report " + Thread.currentThread().getId());
 		this.foundBeacons.add(foundBacon);
 	}
 
 	public void report() {
-		Log.d(LOG_TAG, "Finding current location ..." + Thread.currentThread().getId());
+		//Log.d(LOG_TAG, "Finding current location ..." + Thread.currentThread().getId());
 		mHandler = new Handler();
 		mHandler.postDelayed(new Runnable() {
 			@Override
@@ -66,11 +66,11 @@ public class ReporterTask {
 	}
 	
 	private void startReporting() {
-		Log.d(LOG_TAG, "Starting reporting " +  + Thread.currentThread().getId());
+		//Log.d(LOG_TAG, "Starting reporting " +  + Thread.currentThread().getId());
 		locationUpdater.stop();
 		Location reportLocation = locationUpdater.getCurrentBestLocation();
 		for(BikeBeacon beacon: foundBeacons) {
-			Log.d(LOG_TAG, "Reporting beacon: " + beacon.getMinor() + "...");
+			//Log.d(LOG_TAG, "Reporting beacon: " + beacon.getMinor() + "...");
 			ReportData report = new ReportData();
 			report.setAssetId(beacon.getAssetId());
 			report.setLatitude(reportLocation.getLatitude());

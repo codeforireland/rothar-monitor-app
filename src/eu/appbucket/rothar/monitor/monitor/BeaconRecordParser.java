@@ -1,12 +1,11 @@
 package eu.appbucket.rothar.monitor.monitor;
 
-import android.util.Log;
 
 public class BeaconRecordParser {
 	
 	private int startByte = 2;
 	private byte[] record;
-	private static final String DEBUG_TAG = "BeaconRecordParser";
+	// private static final String DEBUG_TAG = "BeaconRecordParser";
 	private boolean isValidRecord = false;
 	
 	public BeaconRecordParser(byte[] record) {
@@ -45,7 +44,7 @@ public class BeaconRecordParser {
 		// Here is your Minor value
 		int minor = (record[startByte + 22] & 0xff) * 0x100
 				+ (record[startByte + 23] & 0xff);
-		Log.d(DEBUG_TAG, "Tag, uuid: " + uuid + ", major: " + major + ", minor " + minor);
+		//Log.d(DEBUG_TAG, "Tag, uuid: " + uuid + ", major: " + major + ", minor " + minor);
 		BikeBeacon record = new BikeBeacon(uuid, major, minor);
 		return record;
 	}

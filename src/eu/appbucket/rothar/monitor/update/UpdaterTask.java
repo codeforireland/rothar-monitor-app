@@ -32,6 +32,7 @@ public class UpdaterTask extends BroadcastReceiver {
 	private static final String LOG_TAG = "UpdaterTask";
 	
 	private class UpdaterTaskCommunicationError extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		public UpdaterTaskCommunicationError(String errorMessage) {
 			super(errorMessage);
 		}
@@ -40,7 +41,8 @@ public class UpdaterTask extends BroadcastReceiver {
 		}
 	} 
 	
-	private class UpdaterTaskProcessingError extends RuntimeException {		
+	private class UpdaterTaskProcessingError extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		public UpdaterTaskProcessingError(String errorMessage, Throwable throwable) {
 			super(errorMessage, throwable);
 		}

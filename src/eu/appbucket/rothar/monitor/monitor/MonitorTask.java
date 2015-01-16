@@ -11,7 +11,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.report.ReporterTask;
@@ -81,7 +80,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void startScanner() {
-		Log.d(LOG_TAG, "Starting scanner.");
+		//Log.d(LOG_TAG, "Starting scanner.");
 		scanForBeacons();
 	}
 		
@@ -97,7 +96,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void stopScanner() {
-		Log.d(LOG_TAG, "Stopping scanner.");
+		//Log.d(LOG_TAG, "Stopping scanner.");
 		bluetoothAdapter.stopLeScan(scanCallback);
 		if(foundBeacons.size() == 0) {
 			return;
