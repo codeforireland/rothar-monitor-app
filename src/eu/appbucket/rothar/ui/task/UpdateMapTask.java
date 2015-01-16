@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.listener.MapUpdateListener;
 import eu.appbucket.rothar.ui.task.UpdateMapTask.InputParameter;
@@ -47,7 +46,7 @@ public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 		}
 	}
 	
-	private static final String LOG_TAG = "UpdateMapTask";
+	//private static final String LOG_TAG = "UpdateMapTask";
 	private MapUpdateListener listener;
 	private int assetId;
 	
@@ -130,7 +129,7 @@ public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 		        reports.add(report);
 			}
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't process reports.");
+			//Log.e(LOG_TAG, "Can't process reports.");
 		}
 		return reports;
 	}

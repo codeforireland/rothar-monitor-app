@@ -6,13 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import android.os.Environment;
-import android.util.Log;
 
 public class LocalFileLogger {
 	
-	private static String LOG_TAG = "LocalFileLogger";
+	//private static String LOG_TAG = "LocalFileLogger";
 	private static final String LOG_FILE = "log-"+ buildFileTimeStamp() + ".txt";
 	private static final File logFile = new File(
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), LOG_FILE);
@@ -33,14 +33,14 @@ public class LocalFileLogger {
 			logFileWriter.newLine();
 			logFileWriter.flush();
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Can't write to file: " + e.getMessage());
+			//Log.e(LOG_TAG, "Can't write to file: " + e.getMessage());
 		} finally {
 			try {
 				if(logFileWriter != null) {
 					logFileWriter.close();	
 				}
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "Can't close to file: " + e.getMessage());
+				//Log.e(LOG_TAG, "Can't close to file: " + e.getMessage());
 			}
 		}
 	}
@@ -54,12 +54,12 @@ public class LocalFileLogger {
 	}
 	
 	private static String buildLogTimeStamp() {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS", Locale.UK);
 		return formatter.format(new Date());
 	}
 	
 	private static String buildFileTimeStamp() {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
 		return formatter.format(new Date());
 	}
 }

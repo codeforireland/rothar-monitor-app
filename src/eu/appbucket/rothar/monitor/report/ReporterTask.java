@@ -14,7 +14,6 @@ import android.location.Location;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
@@ -95,11 +94,11 @@ public class ReporterTask {
 			postStolenBikeReport(report);
 			return "Report sent for bike id: " + report.getAssetId();
 		} catch (ReporterTaskProcessingError e) {
-			Log.e(LOG_TAG, "Processing report data failed.", e);
+			//Log.e(LOG_TAG, "Processing report data failed.", e);
 			LocalFileLogger.e(LOG_TAG, "Processing report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
 			return "Can't process report for bike id: " + report.getAssetId();
 		} catch (ReporterTaskCommunicationError e) {
-			Log.e(LOG_TAG, "Sending report data failed.", e);
+			//Log.e(LOG_TAG, "Sending report data failed.", e);
 			LocalFileLogger.e(LOG_TAG, "Sending report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
 			return "Can't sent report for bike id: " + report.getAssetId();
 		}

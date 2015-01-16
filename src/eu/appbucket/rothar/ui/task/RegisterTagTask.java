@@ -17,7 +17,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
@@ -56,7 +55,7 @@ class OperationResult {
 public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 
 	private Context context;
-	private static final String LOG_TAG = "RegisterTask";
+	//private static final String LOG_TAG = "RegisterTask";
 
 	public RegisterTagTask(Context context) {
 		this.context = context;
@@ -107,16 +106,16 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 			operationResult.setResult(OPERATION_RESULT.SUCCESS);
 			operationResult.setMessage("Tag activated.");
 		} catch (RegisterTaskCommunicationError e) {
-			Log.e(LOG_TAG, "Communication error: ", e);
+			//Log.e(LOG_TAG, "Communication error: ", e);
 			operationResult.setResult(OPERATION_RESULT.FAILUR);
 			operationResult.setMessage("Can't activate tag because of communication problem.");
 		} catch (RegisterTaskProcessingError e) {
-			Log.e(LOG_TAG, "Processing error: ", e);
+			//Log.e(LOG_TAG, "Processing error: ", e);
 			operationResult.setResult(OPERATION_RESULT.FAILUR);
 			operationResult.setMessage("Can't activate tag because of data problem.");
 		} catch(RegisterTaskServerError e) {
 			ErrorInfo error = convertRowDataToError(e.getMessage());
-			Log.e(LOG_TAG, "Server error: " + error.getDeveloperMessage());
+			//Log.e(LOG_TAG, "Server error: " + error.getDeveloperMessage());
 			operationResult.setResult(OPERATION_RESULT.FAILUR);
 			operationResult.setMessage(error.getClientMessage());
 		}
@@ -183,7 +182,7 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 			asset.setMajor(jsonObject.getInt("major"));
 			asset.setMinor(jsonObject.getInt("minor"));
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't process asset data.");
+			//Log.e(LOG_TAG, "Can't process asset data.");
 		}
 		return asset;
 	}
@@ -196,7 +195,7 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 			error.setClientMessage(jsonObject.getString("clientMessage"));
 			error.setDeveloperMessage(jsonObject.getString("developerMessage")); 			
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't process asset data.");
+			//Log.e(LOG_TAG, "Can't process asset data.");
 		}
 		return error;
 	}

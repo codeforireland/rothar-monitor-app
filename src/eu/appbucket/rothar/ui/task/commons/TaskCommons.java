@@ -136,7 +136,7 @@ public class TaskCommons {
 			error.setClientMessage(jsonObject.getString("clientMessage"));
 			error.setDeveloperMessage(jsonObject.getString("developerMessage")); 			
 		} catch (JSONException e) {
-			// Log.e(LOG_TAG, "Can't process asset data.");
+			// //Log.e(LOG_TAG, "Can't process asset data.");
 		}
 		return error;
 	}

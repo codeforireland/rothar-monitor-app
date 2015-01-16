@@ -21,7 +21,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
-import android.util.Log;
 import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
@@ -66,7 +65,7 @@ public class UpdaterTask extends BroadcastReceiver {
 	private String fetchReportedBikesInBackground() {
 		LocalFileLogger.d(LOG_TAG, "Run updater task.");
 		if(!isNetworkAvailable()) {
-			Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
+			// Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
 			LocalFileLogger.e(LOG_TAG, "Network not available.");
 			return "Can't fetch registered bikes - network disabled.";
 		}
@@ -77,11 +76,11 @@ public class UpdaterTask extends BroadcastReceiver {
 	        populateReportedBikesDatabase(reportedBikes);
 	        return "Registered " + reportedBikes.size() + " stolen bikes.";
 		} catch (UpdaterTaskCommunicationError e) {
-			Log.e(LOG_TAG, "Communication error: ", e);
+			//Log.e(LOG_TAG, "Communication error: ", e);
 			LocalFileLogger.e(LOG_TAG, "Communication error: "+ e.getMessage());
 			return "Can't fetch reported bikes - communication problem.";
 		} catch (UpdaterTaskProcessingError e) {
-			Log.e(LOG_TAG, "Processing error: ", e);
+			//Log.e(LOG_TAG, "Processing error: ", e);
 			LocalFileLogger.e(LOG_TAG, "Processing error: "+ e.getMessage());
 			return "Can't fetch reported bikes - data problem.";
 		}
@@ -147,7 +146,7 @@ public class UpdaterTask extends BroadcastReceiver {
 		        				explrObject.getInt("minor")));			        
 			}
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't process stolen bikes");
+			//Log.e(LOG_TAG, "Can't process stolen bikes");
 		}
 		return stolenBikes;
 	}
