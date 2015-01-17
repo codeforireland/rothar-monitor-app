@@ -15,7 +15,6 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Handler;
 import eu.appbucket.rothar.common.ConfigurationManager;
-import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 import eu.appbucket.rothar.monitor.monitor.LocationReader;
@@ -23,7 +22,7 @@ import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class ReporterTask {
 
-	private static final String LOG_TAG = "ReporterTask";
+	// private static final String LOG_TAG = "ReporterTask";
 	private final Set<BikeBeacon> foundBeacons = new HashSet<BikeBeacon>();
 	private LocationReader locationUpdater;
 	private Handler mHandler;
@@ -89,17 +88,17 @@ public class ReporterTask {
 	}
 	
 	private String postStolenBikeReportInTheBackground(ReportData report) throws ReporterTaskProcessingError {
-		LocalFileLogger.d(LOG_TAG, "Run reporter task.");
+		//LocalFileLogger.d(LOG_TAG, "Run reporter task.");
 		try {
 			postStolenBikeReport(report);
 			return "Report sent for bike id: " + report.getAssetId();
 		} catch (ReporterTaskProcessingError e) {
 			//Log.e(LOG_TAG, "Processing report data failed.", e);
-			LocalFileLogger.e(LOG_TAG, "Processing report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
+			//LocalFileLogger.e(LOG_TAG, "Processing report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
 			return "Can't process report for bike id: " + report.getAssetId();
 		} catch (ReporterTaskCommunicationError e) {
 			//Log.e(LOG_TAG, "Sending report data failed.", e);
-			LocalFileLogger.e(LOG_TAG, "Sending report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
+			//LocalFileLogger.e(LOG_TAG, "Sending report data failed. Asset id: " + report.getAssetId() + ", error message: "+ e.getMessage());
 			return "Can't sent report for bike id: " + report.getAssetId();
 		}
 	}

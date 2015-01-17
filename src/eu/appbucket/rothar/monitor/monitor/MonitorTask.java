@@ -11,7 +11,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.report.ReporterTask;
 import eu.appbucket.rothar.monitor.update.StolenBikeDao;
@@ -19,7 +18,7 @@ import eu.appbucket.rothar.monitor.update.StolenBikeDao;
 public class MonitorTask extends BroadcastReceiver {
 	
 	private Context context;
-	private static final String LOG_TAG = "MonitorTask";
+	// private static final String LOG_TAG = "MonitorTask";
 	private BluetoothManager bluetoothManager;
 	private BluetoothAdapter bluetoothAdapter;
 	private BluetoothAdapter.LeScanCallback scanCallback;
@@ -33,7 +32,7 @@ public class MonitorTask extends BroadcastReceiver {
 	}
 	
 	private void scanForStolenBikes() {
-		LocalFileLogger.d(LOG_TAG, "Run monitor task.");
+		//LocalFileLogger.d(LOG_TAG, "Run monitor task.");
 		setupScanner();
 		startScanner();
 	}

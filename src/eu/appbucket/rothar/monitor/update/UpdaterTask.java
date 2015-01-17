@@ -21,14 +21,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
-import eu.appbucket.rothar.common.LocalFileLogger;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.monitor.monitor.BikeBeacon;
 
 public class UpdaterTask extends BroadcastReceiver {
 
 	private Context context;
-	private static final String LOG_TAG = "UpdaterTask";
+	//private static final String LOG_TAG = "UpdaterTask";
 	
 	private class UpdaterTaskCommunicationError extends RuntimeException {
 		private static final long serialVersionUID = 1L;
@@ -49,7 +48,7 @@ public class UpdaterTask extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		LocalFileLogger.d(LOG_TAG, "Starting updater.");
+		//LocalFileLogger.d(LOG_TAG, "Starting updater.");
 		this.context = context;		
 		new ReportedBikesFetcher().execute();
 	}
@@ -63,10 +62,10 @@ public class UpdaterTask extends BroadcastReceiver {
 	}
 	
 	private String fetchReportedBikesInBackground() {
-		LocalFileLogger.d(LOG_TAG, "Run updater task.");
+		//LocalFileLogger.d(LOG_TAG, "Run updater task.");
 		if(!isNetworkAvailable()) {
 			// Log.i(LOG_TAG, "Can't fetch reigstered bikes because network not availabe.");
-			LocalFileLogger.e(LOG_TAG, "Network not available.");
+			//LocalFileLogger.e(LOG_TAG, "Network not available.");
 			return "Can't fetch registered bikes - network disabled.";
 		}
 		try {
@@ -77,11 +76,11 @@ public class UpdaterTask extends BroadcastReceiver {
 	        return "Registered " + reportedBikes.size() + " stolen bikes.";
 		} catch (UpdaterTaskCommunicationError e) {
 			//Log.e(LOG_TAG, "Communication error: ", e);
-			LocalFileLogger.e(LOG_TAG, "Communication error: "+ e.getMessage());
+			//LocalFileLogger.e(LOG_TAG, "Communication error: "+ e.getMessage());
 			return "Can't fetch reported bikes - communication problem.";
 		} catch (UpdaterTaskProcessingError e) {
 			//Log.e(LOG_TAG, "Processing error: ", e);
-			LocalFileLogger.e(LOG_TAG, "Processing error: "+ e.getMessage());
+			//LocalFileLogger.e(LOG_TAG, "Processing error: "+ e.getMessage());
 			return "Can't fetch reported bikes - data problem.";
 		}
 	}

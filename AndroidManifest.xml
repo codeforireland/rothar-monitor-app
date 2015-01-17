@@ -39,9 +39,13 @@
 		    android:value="@integer/google_play_services_version" />
 		
         <receiver android:name=".monitor.update.UpdaterTask" />
+        
         <receiver android:name=".monitor.monitor.MonitorTask" />
+        
         <receiver android:name=".monitor.scheduler.StartTask" />
+        
         <receiver android:name=".monitor.scheduler.StopTask" />
+        
         <receiver
             android:name=".monitor.scheduler.TaskManager"
             android:enabled="true" >
@@ -52,18 +56,11 @@
         </receiver>
 
         <activity
-            android:name=".ui.MainActivity"
-            android:label="@string/title_activity_register" >
+            android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        
-        <activity
-            android:name=".ui.TagActivity"
-            android:label="@string/title_activity_tag" >
         </activity>
         
         <activity
@@ -77,5 +74,4 @@
         </activity>
         
     </application>
-
 </manifest>

@@ -20,17 +20,17 @@
         android:id="@+id/mark_stolen"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/mark_stolen"/>
+        android:title="@string/action_mark_stolen"/>
 
     <item
         android:id="@+id/mark_recovered"
         android:orderInCategory="200"
         android:showAsAction="never"
-        android:title="@string/mark_found"/>
+        android:title="@string/action_mark_found"/>
     
     <item
         android:id="@+id/donate"
         android:orderInCategory="200"
         android:showAsAction="never"
-        android:title="@string/donate"/>   
+        android:title="@string/action_donate"/>   
 </menu>
