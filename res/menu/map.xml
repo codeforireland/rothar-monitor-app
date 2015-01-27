@@ -29,8 +29,14 @@
         android:title="@string/action_mark_found"/>
     
     <item
+        android:id="@+id/about"
+        android:orderInCategory="250"
+        android:showAsAction="never"
+        android:title="@string/title_activity_about"/> 
+            
+    <item
         android:id="@+id/donate"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:showAsAction="never"
         android:title="@string/action_donate"/>   
 </menu>

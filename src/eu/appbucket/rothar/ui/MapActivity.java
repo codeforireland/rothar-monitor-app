@@ -126,6 +126,9 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 		} else if (id == R.id.donate) {
 			openDonationPage();
 			return true;
+		} else if (id == R.id.about) {
+			startAboutActivity();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -141,5 +144,10 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 	private void openDonationPage() {
 		Uri uri = Uri.parse(Settings.DONATION_URL);
 		startActivity(new Intent(Intent.ACTION_VIEW, uri));
+	}
+	
+	private void startAboutActivity() {
+		Intent intent = new Intent(this, AboutActivity.class);
+		this.startActivity(intent);
 	}
 }

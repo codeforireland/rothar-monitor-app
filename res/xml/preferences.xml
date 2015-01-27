@@ -2,5 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<Preference 
 		android:key="@string/pref_key_app_uuid"
-		android:title="@string/pref_key_app_uuid"/>
+		android:title="@string/pref_title_app_uuid"
+		android:defaultValue="@string/pref_key_app_uuid"/>
 </PreferenceScreen>
