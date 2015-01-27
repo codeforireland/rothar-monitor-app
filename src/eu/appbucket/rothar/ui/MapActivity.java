@@ -21,12 +21,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.listener.MapUpdateListener;
+import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
 import eu.appbucket.rothar.ui.manager.MapManager;
 import eu.appbucket.rothar.ui.manager.TagManager;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
-public class MapActivity extends Activity implements OnMapReadyCallback, MapUpdateListener {
+public class MapActivity extends Activity implements OnMapReadyCallback, ReportUpdateListener {
 
 	private MapManager mapManager;
 	private TagManager tagManager;
@@ -61,7 +61,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback, MapUpda
 		mapManager.loadBicycleReportsForToday();
 	}
     
-	public void onMapReportUpdateSuccess(List<ReportData> reports) {
+	public void onReportUpdateSuccess(List<ReportData> reports) {
 		mapManager.setReports(reports);
 		mapManager.removerReportMarkersAndLineFromMap();
 		mapManager.addReportMarkersAndLineToMap();
@@ -71,7 +71,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback, MapUpda
 	}
 	
 	@Override
-	public void onMapReportUpdateFailure() {
+	public void onReportUpdateFailure() {
 		showFailureInformation();
 		enableUserInteraction();
 	}

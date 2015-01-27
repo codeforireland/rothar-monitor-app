@@ -18,19 +18,19 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.listener.MapUpdateListener;
-import eu.appbucket.rothar.ui.task.UpdateMapTask;
+import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
+import eu.appbucket.rothar.ui.task.ReportUpdateTask;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
 public class MapManager {
 	
 	private Context context;
 	private GoogleMap map;
-	private MapUpdateListener listener;
+	private ReportUpdateListener listener;
 	private List<ReportData> reports;
 	private int dayIndex = 0;
 	
-	public MapManager(Context context, MapUpdateListener listener) {
+	public MapManager(Context context, ReportUpdateListener listener) {
 		this.context = context;
 		this.listener = listener;
 	}
@@ -62,10 +62,10 @@ public class MapManager {
 	}
 	
 	private void loadBicycleReportsForDay(Date date) {
-		UpdateMapTask.InputParameter inputParameter = new UpdateMapTask.InputParameter();
+		ReportUpdateTask.InputParameter inputParameter = new ReportUpdateTask.InputParameter();
 		inputParameter.setAssetId((new ConfigurationManager(context)).getAssetId());
 		inputParameter.setReportDate(date);
-		new UpdateMapTask(context, listener).execute(inputParameter);
+		new ReportUpdateTask(context, listener).execute(inputParameter);
 	}
 	
 	public void removerReportMarkersAndLineFromMap() {

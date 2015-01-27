@@ -2,11 +2,10 @@ package eu.appbucket.rothar.common;
 
 import java.util.UUID;
 
-import eu.appbucket.rothar.web.domain.asset.AssetStatus;
-
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
+import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 
 public class ConfigurationManager {
 	

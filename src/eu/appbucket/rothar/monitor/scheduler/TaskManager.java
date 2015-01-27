@@ -15,6 +15,7 @@ import eu.appbucket.rothar.common.Settings.START_TASK;
 import eu.appbucket.rothar.common.Settings.STOP_TASK;
 import eu.appbucket.rothar.monitor.monitor.MonitorTask;
 import eu.appbucket.rothar.monitor.update.UpdaterTask;
+import eu.appbucket.rothar.ui.task.ReportNotificationTask;
 
 @SuppressWarnings("rawtypes")
 public class TaskManager extends BroadcastReceiver {
@@ -53,9 +54,11 @@ public class TaskManager extends BroadcastReceiver {
 	
 	public void scheduleTasks() {
 		cancelUpdaterTask();
-		setupUpdaterTask();
+		scheduleUpdaterTask();
 		cancelMonitorTask();
-		setupMonitorTask();
+		scheduleMonitorTask();
+		cancelReportNotificationTask();
+		scheduleReportNotificationTask();
 	}
 	
 	private void cancelUpdaterTask() {
@@ -72,12 +75,12 @@ public class TaskManager extends BroadcastReceiver {
 		return pendingIntent;
 	}
 
-	private void setupUpdaterTask() {
+	private void scheduleUpdaterTask() {
 		alarmMgr.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME , 
 				0, 
 				Settings.UPDATER_TASK.FREQUENCY, 
-				buildOperationForClass(UpdaterTask.class));		
+				buildOperationForClass(UpdaterTask.class));
 	}
 	
 	private void cancelMonitorTask() {
@@ -97,7 +100,7 @@ public class TaskManager extends BroadcastReceiver {
 		return time.getHour() * 100 + time.getMinute();
 	}
 		
-	private void setupMonitorTask() {		
+	private void scheduleMonitorTask() {		
 	    for(HourMinute time: startTimes) {
 	    	scheduleMonitorTaskToStartAt(time);
 	    }
@@ -124,5 +127,18 @@ public class TaskManager extends BroadcastReceiver {
 		alarmMgr.setInexactRepeating(
 				AlarmManager.RTC_WAKEUP, getTimestampAtTime(time), STOP_TASK.FREQUENCY, 
 				buildOperationWithIdForClass(buildIdFromTime(time), StopTask.class));
+	}
+	
+	private void cancelReportNotificationTask() {
+		alarmMgr.cancel(buildOperationForClass(ReportNotificationTask.class));
+	}
+	
+	private void scheduleReportNotificationTask() {
+		HourMinute timeAt7pm = new HourMinute(19, 0);
+		alarmMgr.setInexactRepeating(
+				AlarmManager.RTC_WAKEUP,
+				getTimestampAtTime(timeAt7pm),
+				Settings.NOTIFICATION_TASK.FREQUENCY,
+				buildOperationForClass(ReportNotificationTask.class));
 	}
 }

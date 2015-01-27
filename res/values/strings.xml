@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Rothar</string>
-    
+
     <!-- Start screen -->
     <!-- bluetooth dialog -->
     <string name="bluetooth_dialog_title">Bluetooth disabled ?</string>
@@ -11,7 +11,7 @@
     <!-- networking dialog -->
     <string name="networking_dialog_title">Networking disabled ?</string>
     <string name="networking_dialog_message">Please enable wifi or mobile data.</string>
-    
+
     <!-- Map screen -->
     <string name="title_activity_map">Reports map</string>
     <!-- menu -->
@@ -20,10 +20,17 @@
     <string name="action_mark_stolen">Mark as stolen</string>
     <string name="action_mark_found">Mark as found</string>
     <string name="action_donate">Donate</string>
-    
+
     <!-- Register screen -->
     <string name="title_activity_register">Register tag</string>
     <string name="tag_code_hint">Tag code</string>
     <string name="register_button">Activate tag</string>
+    <string name="title_activity_about">About</string>
+    <string name="hello_world">Hello world!</string>
 
+    <!-- Preferences -->
+    <string name="pref_title-app_uuid">Application UUID</string>
+    <string name="pref_key_app_uuid">app-uuid</string>
+    
+    
 </resources>

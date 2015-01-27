@@ -12,8 +12,8 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.AsyncTask;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.listener.MapUpdateListener;
-import eu.appbucket.rothar.ui.task.UpdateMapTask.InputParameter;
+import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
+import eu.appbucket.rothar.ui.task.ReportUpdateTask.InputParameter;
 import eu.appbucket.rothar.ui.task.commons.OperationResult;
 import eu.appbucket.rothar.ui.task.commons.TaskCommons;
 import eu.appbucket.rothar.web.domain.report.ReportData;
@@ -23,7 +23,7 @@ class Result {
 	protected boolean failure = true;
 }
 
-public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
+public class ReportUpdateTask extends AsyncTask<InputParameter, Void, Result> {
 	
 	public static class InputParameter {
 		private Date reportDate;
@@ -47,10 +47,10 @@ public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 	}
 	
 	//private static final String LOG_TAG = "UpdateMapTask";
-	private MapUpdateListener listener;
+	private ReportUpdateListener listener;
 	private int assetId;
 	
-	public UpdateMapTask(Context context, MapUpdateListener listener) {
+	public ReportUpdateTask(Context context, ReportUpdateListener listener) {
 		this.listener = listener;
 	}
 
@@ -137,9 +137,9 @@ public class UpdateMapTask extends AsyncTask<InputParameter, Void, Result> {
 	@Override
 	protected void onPostExecute(Result result) {
 		if(result.failure) {
-			listener.onMapReportUpdateFailure();
+			listener.onReportUpdateFailure();
 		} else {
-			listener.onMapReportUpdateSuccess(result.reports);	
+			listener.onReportUpdateSuccess(result.reports);	
 		}
 	}
 }

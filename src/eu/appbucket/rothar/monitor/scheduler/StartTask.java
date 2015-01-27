@@ -23,6 +23,8 @@ public class StartTask extends BroadcastReceiver {
 		//LocalFileLogger.d(LOG_TAG, "Schedule monitor task.");
 		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);	
 		PendingIntent monitorTask = new TaskManager(context).buildOperationForClass(MonitorTask.class);		
+		// delay was introduced to avoid starting task once
+		// at the start of the application just before it will be canceled
 		long triggerAtMillisDelay = SystemClock.elapsedRealtime() + 1000;
 		alarmMgr.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP,
