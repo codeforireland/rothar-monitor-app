@@ -3,8 +3,10 @@ package eu.appbucket.rothar.common;
 import java.util.UUID;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 
 public class ConfigurationManager {
@@ -16,21 +18,23 @@ public class ConfigurationManager {
 	}
 	
 	private int readIntiger(String nameOfItem, int defaultValue) {
-		int value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
-				.getInt(nameOfItem, defaultValue);
+		int value = getPreferences().getInt(nameOfItem, defaultValue);
 		return value;		
 	}
 
+	private SharedPreferences getPreferences() {
+		return PreferenceManager.getDefaultSharedPreferences(context);
+	}
+	
 	private void saveInteger(String nameOfItem, int valueToSave) {
-		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		Editor editor = getPreferences().edit();
 		editor.putInt(nameOfItem, valueToSave);
 		editor.commit();
 	}
 	
 	private boolean readBoolean(String nameOfItem, boolean defaultValu) {
 		boolean value = 
-				context
-					.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+				getPreferences()
 					.getBoolean(
 							nameOfItem, 
 							defaultValu);
@@ -38,13 +42,13 @@ public class ConfigurationManager {
 	}
 	
 	private void saveBoolean(String nameOfItem, boolean valueToSave) {
-		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		Editor editor = getPreferences().edit();
 		editor.putBoolean(nameOfItem, valueToSave);
 		editor.commit();
 	}
 
 	private String readString(String nameOfItem, String defaultValue) {
-		String value = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE)
+		String value = getPreferences()
 				.getString(nameOfItem, defaultValue);
 		return value;		
 	}
@@ -79,7 +83,7 @@ public class ConfigurationManager {
 	}
 	
 	public void saveApplicationUuid(String appUuid) {
-		Editor editor = context.getSharedPreferences(Settings.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
+		Editor editor = getPreferences().edit();
 		editor.putString(Settings.APPLICATION_UUID_PREF_NAME, appUuid);
 		editor.commit();
 	}
