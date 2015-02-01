@@ -56,6 +56,7 @@ public class Settings {
 	public final static String APPLICATION_UUID_PREF_NAME = "app-uuid";
 	
 	public final static String ASSET_ID_PREF_NAME = "asset-id";
+	public final static String ASSET_CODE_PREF_NAME = "asset-code";
 	public final static String ASSET_STATUS_PREF_NAME = "asset-status";
 	
 	public final static class MAP {

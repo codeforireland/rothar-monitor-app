@@ -32,6 +32,12 @@ public class ConfigurationManager {
 		editor.commit();
 	}
 	
+	private void saveString(String nameOfItem, String valueToSave) {
+		Editor editor = getPreferences().edit();
+		editor.putString(nameOfItem, valueToSave);
+		editor.commit();
+	}
+	
 	private boolean readBoolean(String nameOfItem, boolean defaultValu) {
 		boolean value = 
 				getPreferences()
@@ -92,9 +98,18 @@ public class ConfigurationManager {
 		saveInteger(Settings.ASSET_ID_PREF_NAME, assetId);
 	}
 	
+	public void saveAssetCode(String assetCode) {
+		saveString(Settings.ASSET_CODE_PREF_NAME, assetCode);
+	}
+	
 	public Integer getAssetId() {
 		int value = readIntiger(Settings.ASSET_ID_PREF_NAME, -1);
 		return (value == -1 ? null : value);
+	}
+	
+	public String getAssetCode() {
+		String value = readString(Settings.ASSET_CODE_PREF_NAME, null);
+		return value;
 	}
 	
 	public AssetStatus getAssetStatus() {

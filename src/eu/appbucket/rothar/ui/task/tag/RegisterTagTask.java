@@ -1,4 +1,4 @@
-package eu.appbucket.rothar.ui.task;
+package eu.appbucket.rothar.ui.task.tag;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,53 +12,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
-import android.widget.Toast;
-import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
-import eu.appbucket.rothar.ui.MapActivity;
-import eu.appbucket.rothar.ui.task.OperationResult.OPERATION_RESULT;
+import eu.appbucket.rothar.ui.listener.TagRegisterListener;
 import eu.appbucket.rothar.web.domain.asset.AssetData;
 import eu.appbucket.rothar.web.domain.exception.ErrorInfo;
 
-class OperationResult {
-	
-	public enum OPERATION_RESULT {
-		SUCCESS,
-		FAILUR
-	}
-	
-	private String message;
-	private OPERATION_RESULT result;
-	
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	
-	public void setResult(OPERATION_RESULT result) {
-		this.result = result;
-	}
-	
-	public String getMessage() {
-		return message;
-	}
-	
-	public OPERATION_RESULT getResult() {
-		return result;
-	}
+class Result {
+	protected AssetData asset;
+	protected boolean failure = true;
+	protected String message;
 }
 
-public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
-
+public class RegisterTagTask extends AsyncTask<String, Void, Result> {
+	
+	private TagRegisterListener listener;
 	private Context context;
 	//private static final String LOG_TAG = "RegisterTask";
 
-	public RegisterTagTask(Context context) {
+	public RegisterTagTask(Context context, TagRegisterListener listener) {
 		this.context = context;
+		this.listener = listener;
 	}
 	
 	private class RegisterTaskCommunicationError extends RuntimeException {
@@ -87,37 +64,35 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 	}
 	
 	@Override
-	protected OperationResult doInBackground(String... params) {
+	protected Result doInBackground(String... params) {
 		return getAssetByTagCodeInTheBackgroupd(params[0]);
 	};
 	
-	private OperationResult getAssetByTagCodeInTheBackgroupd(String tagCode) {
-		OperationResult operationResult = new OperationResult();
-		operationResult.setResult(OPERATION_RESULT.FAILUR);
+	private Result getAssetByTagCodeInTheBackgroupd(String tagCode) {
+		Result operationResult = new Result();
 		if(!isNetworkAvailable()) {
-			operationResult.setResult(OPERATION_RESULT.FAILUR);
-			operationResult.setMessage("Can't activate tag because of network problem.");
+			operationResult.failure = true;
+			operationResult.message = "Can't activate tag because of network problem.";
 			return operationResult;
 		}
 		try {
 			String assetRawData = getAssetRawData(tagCode);
-			AssetData asset = convertRowDataToAsset(assetRawData);
-			saveAssetIntoPreferences(asset);
-			operationResult.setResult(OPERATION_RESULT.SUCCESS);
-			operationResult.setMessage("Tag activated.");
+			operationResult.asset = convertRowDataToAsset(assetRawData);
+			operationResult.failure = false;
+			operationResult.message = "Tag activated.";
 		} catch (RegisterTaskCommunicationError e) {
 			//Log.e(LOG_TAG, "Communication error: ", e);
-			operationResult.setResult(OPERATION_RESULT.FAILUR);
-			operationResult.setMessage("Can't activate tag because of communication problem.");
+			operationResult.failure = true;
+			operationResult.message = "Can't activate tag because of communication problem.";
 		} catch (RegisterTaskProcessingError e) {
 			//Log.e(LOG_TAG, "Processing error: ", e);
-			operationResult.setResult(OPERATION_RESULT.FAILUR);
-			operationResult.setMessage("Can't activate tag because of data problem.");
+			operationResult.failure = true;
+			operationResult.message = "Can't activate tag because of data problem.";
 		} catch(RegisterTaskServerError e) {
 			ErrorInfo error = convertRowDataToError(e.getMessage());
 			//Log.e(LOG_TAG, "Server error: " + error.getDeveloperMessage());
-			operationResult.setResult(OPERATION_RESULT.FAILUR);
-			operationResult.setMessage(error.getClientMessage());
+			operationResult.failure = true;
+			operationResult.message = error.getClientMessage();
 		}
 		return operationResult;
 	}
@@ -200,19 +175,13 @@ public class RegisterTagTask extends AsyncTask<String, Void, OperationResult> {
 		return error;
 	}
 	
-	private void saveAssetIntoPreferences(AssetData asset) {
-		new ConfigurationManager(context).saveAssetId(asset.getAssetId());
-	}
-	
-	protected void onPostExecute(OperationResult result) {
-		Toast.makeText(context, result.getMessage(), Toast.LENGTH_SHORT).show();
-		if(result.getResult() == OPERATION_RESULT.SUCCESS) {
-			startMapActivity();
+	protected void onPostExecute(Result result) {
+		if(!result.failure) {
+			listener.onTagRegisterSuccess(result.asset);
+		} else {
+			listener.onTagRegisterFailure(result.message);
 		}
 	}
 	
-	private void startMapActivity() {
-		Intent intent = new Intent(context, MapActivity.class);
-		context.startActivity(intent);
-	}
+
 }
