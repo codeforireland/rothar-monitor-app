@@ -4,8 +4,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp" >
+    android:paddingRight="16dp" 
+    android:gravity="center">
 
+    <TextView
+        android:text="@string/tag_welcome_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textSize="15sp"
+        android:layout_marginTop="15sp"
+        android:gravity="center"/>
+    
+    <TextView
+        android:text="@string/tag_welcome_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="15sp"
+        android:layout_marginTop="15sp"
+        android:gravity="center"/>
+        
     <EditText
         android:id="@+id/tag_code"
         android:layout_width="fill_parent"
@@ -14,7 +33,8 @@
         android:fontFamily="sans-serif-thin"
         android:textSize="15sp"
         android:layout_marginTop="15sp"
-        android:inputType="text|textNoSuggestions|textCapCharacters" />
+        android:inputType="text|textNoSuggestions|textCapCharacters" 
+        android:gravity="center"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -22,6 +42,26 @@
         android:onClick="registerTagByCode"
         android:fontFamily="sans-serif"
         android:textSize="15sp"
-        android:text="@string/register_button" />
-
+        android:layout_marginTop="15sp"
+        android:text="@string/register_button"
+        android:gravity="center"/>
+    
+    <TextView
+        android:text="@string/tag_welcome_footer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="15sp"
+        android:layout_marginTop="15sp"
+        android:gravity="center"/>
+  
+	<Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="requestForTag"
+        android:fontFamily="sans-serif"
+        android:textSize="15sp"
+        android:layout_marginTop="15sp"
+        android:text="@string/request_button"
+        android:gravity="center"/>
 </LinearLayout>
