@@ -17,7 +17,7 @@
     <string name="tag_welcome_header">Welcome in Rothar App !</string>
     <string name="tag_welcome_message">Please enter your 4 letter tag code bellow (or TEST to try the application)</string>
     <string name="tag_welcome_footer">or</string>
-    <string name="tag_code_hint">Tag code</string>
+    <string name="tag_code_hint">....</string>
     <string name="register_button">Activate my tag</string>
     <string name="request_button">Request for new tag</string>
     

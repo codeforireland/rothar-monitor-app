@@ -3,11 +3,13 @@ package eu.appbucket.rothar.common;
 @SuppressWarnings("unused")
 public class Settings {
 	
+	
 	public final static String SERVER_URL = "http://api.rothar.appbucket.eu";
 	public final static String DONATION_URL = 
 			"https://www.paypal.com/cgi-bin/webscr" +
 			"?cmd=_donations&business=ZTA92F5X9P6A2&lc=IE&item_name=Rothar" +
 			"&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted";
+	public final static String EMAIL_ADDRESS = "rotharapp@gmail.com";
 	
 	public final class SYSTEM_IBEACON {
 		public final static String UUID = "372295A7-CA90-6A84-7A29-5F472E4F7206";
