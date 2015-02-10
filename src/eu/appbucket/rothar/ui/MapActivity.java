@@ -24,6 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import eu.appbucket.rothar.R;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.ui.listener.RepordDayChangeListener;
 import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
 import eu.appbucket.rothar.ui.listener.TagUpdateListener;
 import eu.appbucket.rothar.ui.manager.MapManager;
@@ -32,18 +33,20 @@ import eu.appbucket.rothar.web.domain.asset.AssetData;
 import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
-public class MapActivity extends Activity implements OnMapReadyCallback, ReportUpdateListener, TagUpdateListener {
+public class MapActivity extends Activity 
+	implements OnMapReadyCallback, ReportUpdateListener, TagUpdateListener, RepordDayChangeListener {
 
 	private MapManager mapManager;
 	private TagManager tagManager;
 	private ProgressDialog progress;
+	private boolean nextDayMenuIconEnabled = false;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.activity_map);
     	prepareProgressDialog();
-    	mapManager = new MapManager(this, this);
+    	mapManager = new MapManager(this, this, this);
         tagManager = new TagManager(this, this);
         linkActivityAsMapListener();
     }
@@ -112,6 +115,13 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 		} else {
 			menu.findItem(R.id.mark_stolen).setVisible(true);
 			menu.findItem(R.id.mark_recovered).setVisible(false);
+		}
+		if(nextDayMenuIconEnabled) {
+			menu.findItem(R.id.action_next_day).setEnabled(true);
+			menu.findItem(R.id.action_next_day).getIcon().setAlpha(255);
+		} else {
+			menu.findItem(R.id.action_next_day).setEnabled(false);
+			menu.findItem(R.id.action_next_day).getIcon().setAlpha(64);
 		}
 		return true;
 	}
@@ -200,5 +210,22 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 	
 	private void showBikeFoundDialog() {
 		showTagStatusChangedDialog(R.string.marked_found_dialog_title, R.string.marked_found_dialog_message);
+	}
+
+	@Override
+	public void onUpdate(int dayIndex) {
+		if(isCurrentDayIndex(dayIndex)) {
+			nextDayMenuIconEnabled = false;
+		} else {
+			nextDayMenuIconEnabled = true;	
+		}
+		invalidateOptionsMenu();
 	}	
+	
+	private boolean isCurrentDayIndex(int index) {
+		if(index == 0) {
+			return true;
+		}
+		return false;
+	}
 }

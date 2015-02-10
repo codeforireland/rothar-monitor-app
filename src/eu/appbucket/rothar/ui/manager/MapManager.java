@@ -27,13 +27,16 @@ public class MapManager {
 	
 	private Context context;
 	private GoogleMap map;
-	private ReportUpdateListener listener;
+	private ReportUpdateListener reportUpdateListener;
+	RepordDayChangeListener repordDayChangeListener;
 	private List<ReportData> reports;
 	private int dayIndex = 0;
 	
-	public MapManager(Context context, ReportUpdateListener reportUpdateListener, RepordDayChangeListener repordDayChangeListener) {
+	public MapManager(Context context, 
+			ReportUpdateListener reportUpdateListener, RepordDayChangeListener repordDayChangeListener) {
 		this.context = context;
-		this.listener = reportUpdateListener;
+		this.reportUpdateListener = reportUpdateListener;
+		this.repordDayChangeListener = repordDayChangeListener;
 	}
 
 	public void setMap(GoogleMap map) {
@@ -66,7 +69,7 @@ public class MapManager {
 		ReportUpdateTask.InputParameter inputParameter = new ReportUpdateTask.InputParameter();
 		inputParameter.setAssetId((new ConfigurationManager(context)).getAssetId());
 		inputParameter.setReportDate(date);
-		new ReportUpdateTask(context, listener).execute(inputParameter);
+		new ReportUpdateTask(context, reportUpdateListener).execute(inputParameter);
 	}
 	
 	public void removerReportMarkersAndLineFromMap() {
@@ -116,7 +119,7 @@ public class MapManager {
 	
 	public Date getDateForToday() {
 		dayIndex = 0;
-		repordDayChangeListener ...
+		repordDayChangeListener.onUpdate(dayIndex);
 		return getDateForDayIndex();
 	}
 	
@@ -129,14 +132,14 @@ public class MapManager {
 	public Date getDateForNextDay() {
 		if(dayIndex < 0) {
 			dayIndex++;
-			repordDayChangeListener ...
+			repordDayChangeListener.onUpdate(dayIndex);
 		}
 		return getDateForDayIndex();
 	}
 	
 	public Date getDateForPreviousDay() {
 		dayIndex--;	
-		repordDayChangeListener ...
+		repordDayChangeListener.onUpdate(dayIndex);
 		return getDateForDayIndex();
 	}
 }
