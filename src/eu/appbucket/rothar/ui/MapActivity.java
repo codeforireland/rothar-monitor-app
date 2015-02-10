@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -173,11 +175,30 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 		new ConfigurationManager(this).setAssetStatus(bikeStatus);
 		if(bikeStatus == AssetStatus.STOLEN) {
 			bikeStatus = AssetStatus.STOLEN;
-			Toast.makeText(this, "We will search for your bike.", Toast.LENGTH_SHORT).show();
+			invalidateOptionsMenu();
+			showBikeStolenDialog();
 		} else {
 			bikeStatus = AssetStatus.RECOVERED;
-			Toast.makeText(this, "We found your bike !", Toast.LENGTH_SHORT).show();
-		}
-		invalidateOptionsMenu();
+			invalidateOptionsMenu();
+			showBikeFoundDialog();
+		}		
 	}
+	
+	private void showBikeStolenDialog() {
+		showTagStatusChangedDialog(R.string.marked_stolen_dialog_title, R.string.marked_stolen_dialog_message);
+	}
+	
+	private void showTagStatusChangedDialog(int titleId, int messageId) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setTitle(titleId).setMessage(messageId);
+	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {}
+	       });
+	    AlertDialog dialog = builder.create();
+	    dialog.show();
+	}
+	
+	private void showBikeFoundDialog() {
+		showTagStatusChangedDialog(R.string.marked_found_dialog_title, R.string.marked_found_dialog_message);
+	}	
 }

@@ -21,6 +21,11 @@
     <string name="register_button">Activate my tag</string>
     <string name="request_button">Request for new tag</string>
     
+    <string name="marked_stolen_dialog_title">We will search for your bike.</string>
+    <string name="marked_stolen_dialog_message">You will receive notification when your bike will found by any member of Rothar app community.</string>
+    <string name="marked_found_dialog_title">Bike found !</string>
+    <string name="marked_found_dialog_message">We found your bike. Please consider donating.</string>
+    
     <!-- Map screen -->
     <string name="title_activity_map">Reports map</string>
     <!-- menu -->
