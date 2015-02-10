@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.ui.listener.TagUpdateListener;
 import eu.appbucket.rothar.ui.task.commons.OperationResult.OPERATION_RESULT;
 import eu.appbucket.rothar.ui.task.commons.OperationResult;
 import eu.appbucket.rothar.ui.task.commons.TaskCommons;
@@ -17,10 +18,12 @@ import eu.appbucket.rothar.web.domain.asset.AssetData;
 public class UpdateTagTask extends AsyncTask<AssetData, Void, OperationResult> {
 
 	private Context context;
+	private TagUpdateListener listener;
 	private AssetData asset;
 	
-	public UpdateTagTask(Context context) {
+	public UpdateTagTask(Context context, TagUpdateListener listener) {
 		this.context = context;
+		this.listener = listener;
 	}
 	
 	@Override
@@ -50,10 +53,10 @@ public class UpdateTagTask extends AsyncTask<AssetData, Void, OperationResult> {
 	@Override
 	protected void onPostExecute(OperationResult result) {
 		if(result.getResult() == OPERATION_RESULT.SUCCESS) {
-			new ConfigurationManager(context).setAssetStatus(asset.getStatus());
-			Toast.makeText(context, "Bike status set to: " + asset.getStatus(), Toast.LENGTH_SHORT).show();		
+			listener.onTagUpdateSuccess(asset);
+					
 		} else {
-			Toast.makeText(context, "Bike status update failed: " + result.getMessage(), Toast.LENGTH_SHORT).show();			
+			listener.onTagUpdateFailure(result.getMessage());			
 		}
 	}
 }

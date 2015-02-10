@@ -20,13 +20,17 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 import eu.appbucket.rothar.R;
+import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
 import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
+import eu.appbucket.rothar.ui.listener.TagUpdateListener;
 import eu.appbucket.rothar.ui.manager.MapManager;
 import eu.appbucket.rothar.ui.manager.TagManager;
+import eu.appbucket.rothar.web.domain.asset.AssetData;
+import eu.appbucket.rothar.web.domain.asset.AssetStatus;
 import eu.appbucket.rothar.web.domain.report.ReportData;
 
-public class MapActivity extends Activity implements OnMapReadyCallback, ReportUpdateListener {
+public class MapActivity extends Activity implements OnMapReadyCallback, ReportUpdateListener, TagUpdateListener {
 
 	private MapManager mapManager;
 	private TagManager tagManager;
@@ -38,7 +42,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
     	setContentView(R.layout.activity_map);
     	prepareProgressDialog();
     	mapManager = new MapManager(this, this);
-        tagManager = new TagManager(this);
+        tagManager = new TagManager(this, this);
         linkActivityAsMapListener();
     }
     
@@ -90,16 +94,23 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 		String message;
 		String formatterReportDate = formatter.format(reportDate);
 		if(mapManager.constainsReportsForCurrentDay()) {
-			message = "Found report(s) for: " + formatterReportDate;
+			message = "Bike found on " + formatterReportDate;
 		} else {
-			message = "No reports found for: " + formatterReportDate;
+			message = "Bike not found on " + formatterReportDate;
 		}
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.map, menu);
+		if(tagManager.isBikeStolen()) {
+			menu.findItem(R.id.mark_stolen).setVisible(false);
+			menu.findItem(R.id.mark_recovered).setVisible(true);
+		} else {
+			menu.findItem(R.id.mark_stolen).setVisible(true);
+			menu.findItem(R.id.mark_recovered).setVisible(false);
+		}
 		return true;
 	}
 	
@@ -149,5 +160,24 @@ public class MapActivity extends Activity implements OnMapReadyCallback, ReportU
 	private void startAboutActivity() {
 		Intent intent = new Intent(this, AboutActivity.class);
 		this.startActivity(intent);
+	}
+	
+	@Override
+	public void onTagUpdateFailure(String cause) {
+		Toast.makeText(this, "Bike status update failed: " + cause, Toast.LENGTH_SHORT).show();
+	}
+	
+	@Override
+	public void onTagUpdateSuccess(AssetData asset) {
+		AssetStatus bikeStatus = asset.getStatus();
+		new ConfigurationManager(this).setAssetStatus(bikeStatus);
+		if(bikeStatus == AssetStatus.STOLEN) {
+			bikeStatus = AssetStatus.STOLEN;
+			Toast.makeText(this, "We will search for your bike.", Toast.LENGTH_SHORT).show();
+		} else {
+			bikeStatus = AssetStatus.RECOVERED;
+			Toast.makeText(this, "We found your bike !", Toast.LENGTH_SHORT).show();
+		}
+		invalidateOptionsMenu();
 	}
 }
