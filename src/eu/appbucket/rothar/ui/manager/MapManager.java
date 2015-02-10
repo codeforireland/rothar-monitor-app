@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import eu.appbucket.rothar.common.ConfigurationManager;
 import eu.appbucket.rothar.common.Settings;
+import eu.appbucket.rothar.ui.listener.RepordDayChangeListener;
 import eu.appbucket.rothar.ui.listener.ReportUpdateListener;
 import eu.appbucket.rothar.ui.task.ReportUpdateTask;
 import eu.appbucket.rothar.web.domain.report.ReportData;
@@ -30,9 +31,9 @@ public class MapManager {
 	private List<ReportData> reports;
 	private int dayIndex = 0;
 	
-	public MapManager(Context context, ReportUpdateListener listener) {
+	public MapManager(Context context, ReportUpdateListener reportUpdateListener, RepordDayChangeListener repordDayChangeListener) {
 		this.context = context;
-		this.listener = listener;
+		this.listener = reportUpdateListener;
 	}
 
 	public void setMap(GoogleMap map) {
@@ -115,6 +116,7 @@ public class MapManager {
 	
 	public Date getDateForToday() {
 		dayIndex = 0;
+		repordDayChangeListener ...
 		return getDateForDayIndex();
 	}
 	
@@ -126,13 +128,15 @@ public class MapManager {
 	
 	public Date getDateForNextDay() {
 		if(dayIndex < 0) {
-			dayIndex++;	
+			dayIndex++;
+			repordDayChangeListener ...
 		}
 		return getDateForDayIndex();
 	}
 	
 	public Date getDateForPreviousDay() {
 		dayIndex--;	
+		repordDayChangeListener ...
 		return getDateForDayIndex();
 	}
 }
