@@ -169,8 +169,13 @@ public class MapActivity extends Activity
 		startActivity(new Intent(Intent.ACTION_VIEW, uri));
 	}
 	
-	private void startAboutActivity() {
+	/*private void startAboutActivity() {
 		Intent intent = new Intent(this, AboutActivity.class);
+		this.startActivity(intent);
+	}*/
+	
+	private void startAboutActivity() {
+		Intent intent = new Intent(this, SettingsActivity.class);
 		this.startActivity(intent);
 	}
 	
