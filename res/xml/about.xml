@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <ListPreference        
+        android:key="pref_syncConnectionType"
+        android:title="ID"
+        android:dialogTitle="Dialog title"
+        android:entries="@array/pref_1_labels"
+        android:entryValues="@array/pref_1_values"
+       	android:defaultValue="180"
+       	android:summary="%s"
+       	android:enabled="false"/>
+    
+</PreferenceScreen>
