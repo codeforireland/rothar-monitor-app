@@ -14,10 +14,6 @@ public class SettingsActivity extends Activity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        Editor editor = sharedPrefs.edit();
-		editor.putString("pref_syncConnectionType", "15");
-		editor.commit();
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())

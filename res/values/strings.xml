@@ -14,7 +14,7 @@
 
     <!-- Register screen -->
     <string name="title_activity_register">Register tag</string>
-    <string name="tag_welcome_header">Welcome in Rothar App !</string>
+    <string name="tag_welcome_header">Welcome to Rothar App !</string>
     <string name="tag_welcome_message">Please enter your 4 letter tag code bellow (or TEST to try the application)</string>
     <string name="tag_welcome_footer">or</string>
     <string name="tag_code_hint">....</string>
@@ -36,9 +36,16 @@
     <string name="action_donate">Donate</string>
 
     <!-- About -->
-    <string name="title_activity_about">About</string>    
-    <string name="pref_title_app_uuid">Application UUID</string>
+    <string name="title_activity_about">About</string>
+    <string name="category_application">Application</string>
+    <string name="pref_title_app_uuid">UUID</string>
     <string name="pref_key_app_uuid">app-uuid</string>
-    
+    <string name="pref_title_app_version">Version</string>
+    <string name="pref_key_app_version">app-version</string>
+    <string name="category_tag">Tag</string>
+    <string name="pref_title_tag_id">Id</string>
+    <string name="pref_key_tag_id">tag-id</string>
+    <string name="pref_title_tag_code">Code</string>
+    <string name="pref_key_tag_code">tag-code</string>
     
 </resources>

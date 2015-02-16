@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <ListPreference
-        android:key="pref_syncConnectionType"
-        android:title="ID"
-        android:dialogTitle="Dialog title"
-        android:entries="@array/pref_1_labels"
-        android:entryValues="@array/pref_1_values"
-       	android:defaultValue="180"
-       	android:summary="%s"
-       	android:enabled="false"/>
-	<EditTextPreference
-	    android:title="Latitude" 
-	    android:key="posLat"
-	    android:enabled="false"/>
-
+    <PreferenceCategory 
+        android:title="@string/category_tag">
+        <EditTextPreference
+		    android:title="@string/pref_title_tag_code"
+		    android:key="@string/pref_key_tag_code"
+		    android:enabled="false"/>
+		<EditTextPreference
+		    android:title="@string/pref_title_tag_id" 
+		    android:key="@string/pref_key_tag_id"
+		    android:enabled="false"/>
+	</PreferenceCategory>
+	
+	<PreferenceCategory 
+        android:title="@string/category_application">
+			<EditTextPreference
+			    android:title="@string/pref_title_app_version" 
+			    android:key="@string/pref_key_app_version"
+			    android:enabled="false"/>
+		    <EditTextPreference
+			    android:title="@string/pref_title_app_uuid" 
+			    android:key="@string/pref_key_app_uuid"
+			    android:enabled="false"/>
+    </PreferenceCategory>
+    
 </PreferenceScreen>
